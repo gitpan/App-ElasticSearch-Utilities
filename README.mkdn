@@ -1,0 +1,77 @@
+# NAME
+
+App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
+
+# VERSION
+
+version 1.002
+
+# SYNOPSIS
+
+This library contains utilities for unified interfaces in the scripts.
+
+This a set of utilities to make monitoring ElasticSearch clusters much simpler.
+
+Included is:
+
+    scripts/es-status.pl - Command line utility for ES Metrics
+    scripts/es-metrics-to-graphite.pl - Send ES Metrics to Graphite or Cacti
+    scripts/es-nagios-check.pl - Monitor ES remotely or via NRPE with this script
+    scripts/es-daily-index-maintenance.pl - Perform index maintenance on daily indexes
+    scripts/es-copy-index.pl - Copy an index from one cluster to another
+
+The App::ElasticSearch::Utilities module simply serves as a wrapper around the scripts for packaging and
+distribution.
+
+# INSTALL
+
+Recommended install with [CPAN Minus](http://cpanmin.us):
+
+    cpanm App::ElsticSearch::Utilities
+
+You can also use CPAN:
+
+    cpan App::ElsticSearch::Utilities
+
+Or if you'd prefer to manually install:
+
+    export RELEASE=<CurrentRelease>
+
+    wget --no-check-certificate https://github.com/reyjrar/es-utils/blob/master/releases/App-ElasticSearch-Utilities-$RELEASE.tar.gz?raw=true -O es-utils.tgz
+
+    tar -zxvf es-utils.tgz
+
+    cd App-ElasticSearch-Utilities-$RELEASE
+
+    perl Makefile.PL
+
+    make
+
+    make install
+
+This will take care of ensuring all the dependencies are satisfied and will install the scripts into the same
+directory as your Perl executable.
+
+## USAGE
+
+The tools are all wrapped in their own documentation, please see:
+
+    es-status.pl --help
+    es-metric-to-graphite.pl --help
+    es-nagios-check.pl --help
+    es-daily-index-maintenance.pl --help
+    es-copy-index.pl --help
+
+For individual options and capabilities
+
+# AUTHOR
+
+Brad Lhotsky <brad@divisionbyzero.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Brad Lhotsky.
+
+This is free software, licensed under:
+
+    The (three-clause) BSD License
