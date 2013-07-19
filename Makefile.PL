@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010;
 
 use ExtUtils::MakeMaker 6.30;
 
@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-ElasticSearch-Utilities",
   "EXE_FILES" => [
+    "scripts/es-alias-manager.pl",
     "scripts/es-copy-index.pl",
     "scripts/es-daily-index-maintenance.pl",
     "scripts/es-metrics-to-graphite.pl",
@@ -54,7 +55,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "1.002",
+  "VERSION" => "1.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

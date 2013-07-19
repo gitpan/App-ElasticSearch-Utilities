@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.003'; # VERSION
 
 use strict;
 use warnings;
@@ -147,7 +147,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -162,6 +162,7 @@ Included is:
     scripts/es-nagios-check.pl - Monitor ES remotely or via NRPE with this script
     scripts/es-daily-index-maintenance.pl - Perform index maintenance on daily indexes
     scripts/es-copy-index.pl - Copy an index from one cluster to another
+    scripts/es-alias-manager.pl - Manage index aliases automatically
 
 The App::ElasticSearch::Utilities module simply serves as a wrapper around the scripts for packaging and
 distribution.
@@ -170,11 +171,11 @@ distribution.
 
 Recommended install with L<CPAN Minus|http://cpanmin.us>:
 
-    cpanm App::ElsticSearch::Utilities
+    cpanm App::ElasticSearch::Utilities
 
 You can also use CPAN:
 
-    cpan App::ElsticSearch::Utilities
+    cpan App::ElasticSearch::Utilities
 
 Or if you'd prefer to manually install:
 
@@ -204,6 +205,7 @@ The tools are all wrapped in their own documentation, please see:
     es-nagios-check.pl --help
     es-daily-index-maintenance.pl --help
     es-copy-index.pl --help
+    es-alias-manager.pl --help
 
 For individual options and capabilities
 
