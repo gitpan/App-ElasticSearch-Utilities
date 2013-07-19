@@ -153,7 +153,7 @@ foreach my $index (sort keys %{ $indices }) {
             }
         }
         else {
-            if( $segment_ratio > 1 ) {
+            if( defined($segment_ratio) && $segment_ratio > 1 ) {
                 verbose("$index is active not optimizing (segment_ratio:$segment_ratio)");
             }
             else {
@@ -173,7 +173,7 @@ es-daily-index-maintenance.pl - Run to prune old indexes and optimize existing
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 
