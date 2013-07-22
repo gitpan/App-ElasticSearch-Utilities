@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-ElasticSearch-Utilities",
   "EXE_FILES" => [
     "scripts/es-alias-manager.pl",
+    "scripts/es-apply-settings.pl",
     "scripts/es-copy-index.pl",
     "scripts/es-daily-index-maintenance.pl",
     "scripts/es-metrics-to-graphite.pl",
@@ -55,7 +56,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "1.004",
+  "VERSION" => "1.005",
   "test" => {
     "TESTS" => "t/*.t"
   }

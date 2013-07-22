@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '1.004'; # VERSION
+our $VERSION = '1.005'; # VERSION
 
 use strict;
 use warnings;
@@ -147,7 +147,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -163,6 +163,7 @@ Included is:
     scripts/es-daily-index-maintenance.pl - Perform index maintenance on daily indexes
     scripts/es-copy-index.pl - Copy an index from one cluster to another
     scripts/es-alias-manager.pl - Manage index aliases automatically
+    scripts/es-apply-settings.pl - Apply settings to all indexes matching a pattern
 
 The App::ElasticSearch::Utilities module simply serves as a wrapper around the scripts for packaging and
 distribution.
@@ -206,6 +207,7 @@ The tools are all wrapped in their own documentation, please see:
     es-daily-index-maintenance.pl --help
     es-copy-index.pl --help
     es-alias-manager.pl --help
+    es-apply-settings.pl --help
 
 For individual options and capabilities
 

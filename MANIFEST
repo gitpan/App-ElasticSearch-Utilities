@@ -8,6 +8,7 @@ README.mkdn
 dist.ini
 lib/App/ElasticSearch/Utilities.pm
 scripts/es-alias-manager.pl
+scripts/es-apply-settings.pl
 scripts/es-copy-index.pl
 scripts/es-daily-index-maintenance.pl
 scripts/es-metrics-to-graphite.pl
