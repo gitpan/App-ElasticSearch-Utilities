@@ -277,7 +277,7 @@ es-metrics-to-graphite.pl - Gather performance metrics from an ES node and send 
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 

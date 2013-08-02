@@ -11,7 +11,7 @@ BEGIN {
 
 use DateTime;
 use ElasticSearch;
-use JSON::XS;
+use JSON;
 use LWP::Simple;
 use Getopt::Long;
 use Pod::Usage;
@@ -173,7 +173,7 @@ es-daily-index-maintenance.pl - Run to prune old indexes and optimize existing
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 

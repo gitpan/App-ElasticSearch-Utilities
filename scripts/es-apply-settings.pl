@@ -11,7 +11,7 @@ BEGIN {
 
 use DateTime;
 use ElasticSearch;
-use JSON::XS;
+use JSON;
 use LWP::Simple;
 use Getopt::Long;
 use Pod::Usage;
@@ -172,7 +172,7 @@ es-apply-settings.pl - Run to apply a JSON list of settings to indexes matching 
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 

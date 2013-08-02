@@ -38,7 +38,6 @@ my %WriteMakefileArgs = (
     "IO::Socket::INET" => 0,
     "IPC::Run3" => 0,
     "JSON" => 0,
-    "JSON::XS" => 0,
     "LWP::Simple" => 0,
     "MIME::Lite" => 0,
     "Pod::Usage" => 0,
@@ -56,7 +55,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "1.005",
+  "VERSION" => "1.006",
   "test" => {
     "TESTS" => "t/*.t"
   }

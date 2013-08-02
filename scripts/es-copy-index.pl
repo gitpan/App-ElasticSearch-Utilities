@@ -16,7 +16,6 @@ use File::Basename;
 use File::Spec;
 use FindBin;
 use Getopt::Long;
-use JSON::XS;
 use MIME::Lite;
 use Pod::Usage;
 use Sys::Hostname;
@@ -139,7 +138,7 @@ es-copy-index.pl - Copy an index from one cluster to another
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
       "Brad Lhotsky <brad@divisionbyzero.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.131560",
    "license" : [
       "bsd"
    ],
@@ -38,7 +38,6 @@
             "IO::Socket::INET" : "0",
             "IPC::Run3" : "0",
             "JSON" : "0",
-            "JSON::XS" : "0",
             "LWP::Simple" : "0",
             "MIME::Lite" : "0",
             "Pod::Usage" : "0",
@@ -73,7 +72,7 @@
          "web" : "https://github.com/reyjrar/es-utils"
       }
    },
-   "version" : "1.005",
+   "version" : "1.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.016003"

@@ -11,9 +11,7 @@ BEGIN {
 
 use DateTime;
 use ElasticSearch;
-use JSON::XS;
 use YAML;
-use LWP::Simple;
 use Getopt::Long;
 use Pod::Usage;
 use App::ElasticSearch::Utilities qw(:all);
@@ -184,7 +182,7 @@ es-alias-manager.pl - Allow easy alias management for daily indexes
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 
