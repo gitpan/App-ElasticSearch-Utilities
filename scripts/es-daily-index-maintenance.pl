@@ -25,8 +25,12 @@ GetOptions(\%opt,
     'all',
     'host:s',
     'port:i',
+    'dry-run',
     'delete',
     'delete-days:i',
+    'replicas:i',
+    'replicas-min:i',
+    'replicas-age:s',
     'optimize',
     'optimize-days:i',
     'index-basename:s',
@@ -39,31 +43,51 @@ GetOptions(\%opt,
 
 #------------------------------------------------------------------------#
 # Documentations!
-pod2usage(1) if $opt{help};
-pod2usage(-exitstatus => 0, -verbose => 2) if $opt{manual};
+pod2usage(-exitval => 0) if $opt{help};
+pod2usage(-exitval => 0, -verbose => 2) if $opt{manual};
 
 #------------------------------------------------------------------------#
 # Host or Local
-pod2usage(1) unless defined $opt{local} or defined $opt{host};
+pod2usage(-exitval => 1, -message => "Destination host not specified, use --local or --host.") unless defined $opt{local} or defined $opt{host};
 
 my %CFG = (
     'optimize-days'  => 1,
     'delete-days'    => 90,
+    'replicas-min'   => 0,
+    'dry-run'        => 0,
+    'replicas-age'   => "1,30",
     'index-basename' => 'logstash',
     'date-separator' => '.',
     timezone         => 'Europe/Amsterdam',
     port             => 9200,
     delete           => 0,
     optimize         => 0,
+    replicas         => 0,
 );
 # Extract from our options if we've overridden defaults
 foreach my $setting (keys %CFG) {
     $CFG{$setting} = $opt{$setting} if exists $opt{$setting} and defined $opt{$setting};
 }
-$CFG{delete} = $CFG{optimize} = 1 if exists $opt{all} and $opt{all};
-if ( $CFG{delete} == 0 and $CFG{optimize} == 0 ) {
-    pod2usage(1);
+# Turn on verbose if debug is enabled
+override(verbose => 1) if $CFG{'dry-run'};
+
+# Figure out what to run
+my @MODES = qw(delete optimize replicas);
+if ( exists $opt{all} && $opt{all} ) {
+    map {
+        $CFG{$_} = 1 unless $_ eq 'replicas';
+    } @MODES;
 }
+else {
+    my $operate = 0;
+    foreach my $mode (@MODES) {
+        $operate++ if $CFG{$mode};
+        last if $operate;
+    }
+    pod2usage(-message => "No operation selected, use --delete, --optimize, or --replicas.", -exitval => 1) unless $operate;
+}
+# Can't have replicas-min below 0
+$CFG{'replicas-min'} = 0 if $CFG{'replicas-min'} < 0;
 
 # Create the target uri for the ES Cluster
 my $TARGET = exists $opt{host} && defined $opt{host} ? $opt{host} : 'localhost';
@@ -78,8 +102,12 @@ my $es = ElasticSearch->new(
 );
 
 # Delete Indexes older than a certain point
-my $DEL      = DateTime->now(time_zone => $CFG{timezone})->truncate( to => 'day' )->subtract( days => $CFG{'delete-days'} );
-my $OPTIMIZE = DateTime->now(time_zone => $CFG{timezone})->truncate( to => 'day' )->subtract( days => $CFG{'optimize-days'} );
+my $NOW      = DateTime->now(time_zone => $CFG{timezone})->truncate( to => 'day' );
+my $DEL      = $NOW->clone->subtract( days => $CFG{'delete-days'} );
+my $OPTIMIZE = $NOW->clone->subtract( days => $CFG{'optimize-days'} );
+my @AGES     = grep { my $x = int($_); $x > 0; } split /,/, $CFG{'replicas-age'};
+
+# Retrieve a list of indexes
 my $d_res = $es->cluster_state(
     filter_nodes         => 1,
     filter_routing_table => 1,
@@ -89,6 +117,7 @@ if ( !defined $indices ) {
     output({color=>"red"}, "Unable to locate indices in status!");
     exit 1;
 }
+
 # Loop through the indices and take appropriate actions;
 foreach my $index (sort keys %{ $indices }) {
     verbose("$index being evaluated");
@@ -114,8 +143,34 @@ foreach my $index (sort keys %{ $indices }) {
         output({color=>"red"}, "$index will be deleted.");
         eval {
             my $rc = $es->delete_index( index => $index );
-        };
+        } unless $CFG{'dry-run'};
         next;
+    }
+
+    # Manage replicas
+    if( $CFG{replicas} ) {
+        my $days_old  = $NOW->delta_days($idx_dt)->delta_days;
+        my $current_replicas = $indices->{$index}{settings}{"index.number_of_replicas"};
+        debug({color=>"cyan"}, " - index is $days_old days old");
+        my $replicas = $CFG{replicas};
+        foreach my $age ( @AGES ) {
+            if ( $days_old >= $age ) {
+                $replicas--;
+            }
+        }
+        $replicas = $CFG{'replicas-min'} if $replicas < $CFG{'replicas-min'};
+        if ( $replicas != $current_replicas ) {
+            verbose({color=>'yellow'}, " - should have $replicas replicas, has $current_replicas");
+            eval {
+                $es->update_index_settings(
+                    index => $index,
+                    settings => { number_of_replicas => $replicas},
+                );
+            } unless $CFG{'dry-run'};
+            if (my $err = $@ ) {
+                output({color=>'red'}, "Failed setting replicas to $replicas for $index.", $err);
+            }
+        }
     }
 
     # Run optimize?
@@ -147,7 +202,7 @@ foreach my $index (sort keys %{ $indices }) {
                     wait_for_merge   => 0,
                 );
                 output({color=>"green"}, "$index: $o_res->{_shards}{successful} of $o_res->{_shards}{total} shards optimized.");
-            };
+            } unless $CFG{'dry-run'};
             if( my $error = $@ ) {
                 output({color=>"red"}, "$index: Encountered error during optimize: $error");
             }
@@ -173,7 +228,7 @@ es-daily-index-maintenance.pl - Run to prune old indexes and optimize existing
 
 =head1 VERSION
 
-version 1.006
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -183,6 +238,7 @@ Options:
 
     --help              print help
     --manual            print full manual
+    --dry-run           Tell me what you would do, but don't do it.
     --local             Poll localhost and use name reported by ES
     --host|-H           Host to poll for statistics
     --local             Assume localhost as the host
@@ -191,6 +247,9 @@ Options:
     --delete-days       Age of oldest index to keep (default: 90)
     --optimize          Run optimize on indexes
     --optimize-days     Age of first index to optimize (default: 1)
+    --replicas          Sets the number of initial replicas, and manages replica aging
+    --replicas-age      CSV list of ages in days to decrement number of replicas
+    --replicas-min      Minimum number of replicas this index may have, default:0
     --index-basename    Default is 'logstash'
     --date-separator    Default is '.'
     --quiet             Ideal for running on cron, only outputs errors
@@ -209,13 +268,42 @@ Use with cron:
 
 =over 8
 
-=item B<help>
+=item B<optimize>
 
-Print this message and exit
+Run the optimization hook
 
-=item B<manual>
+=item B<optimize-days>
 
-Print this message and exit
+Integer, optimize indexes older than this number of days
+
+=item B<delete>
+
+Run the delete hook
+
+=item B<delete-days>
+
+Integer, delete indexes older than this number of days
+
+=item B<replicas>
+
+Sets the number of initial replicas for an index type.  This is used to compute the
+expected number of replicas based on the the age of the index.
+
+    --replicas=2
+
+=item B<replicas-age>
+
+A comma separated list of the ages at which to decrement to the number of replicas, the default is:
+
+    --replicas-age 1,30
+
+Can be as long as you'd like, but the replica aging will stop at the replicas-min.
+
+=item B<replicas-min>
+
+The minimum number of replicas to allow replica aging to set.  The default is 0
+
+    --replicas-min=1
 
 =item B<local>
 
@@ -228,6 +316,14 @@ Optional, the host to maintain (if not specified --local required)
 =item B<verbose>
 
 Verbose stats, to not interfere with cacti, output goes to STDERR
+
+=item B<help>
+
+Print this message and exit
+
+=item B<manual>
+
+Print this message and exit
 
 =back
 

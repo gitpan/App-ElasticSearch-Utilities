@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '1.006'; # VERSION
+our $VERSION = '1.1'; # VERSION
 
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use YAML;
 use Getopt::Long qw(:config pass_through);
 use Sub::Exporter -setup => {
     exports => [
-        qw(output verbose debug debug_var)
+        qw(output verbose debug debug_var override)
     ],
 };
 
@@ -130,7 +130,15 @@ sub debug_var {
     }
     output( $opts, Dump shift);
 }
+my %_allow_override = map { $_ => 1 } qw(debug verbose);
+sub override {
+    my ($var,$value) = @_;
 
+    return unless exists $_allow_override{lc $var};
+
+    my $def_var = uc $var;
+    $DEF{$def_var} = $value;
+}
 
 
 
@@ -147,7 +155,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 1.006
+version 1.1
 
 =head1 SYNOPSIS
 

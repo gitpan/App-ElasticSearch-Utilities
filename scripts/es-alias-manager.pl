@@ -182,7 +182,7 @@ es-alias-manager.pl - Allow easy alias management for daily indexes
 
 =head1 VERSION
 
-version 1.006
+version 1.1
 
 =head1 SYNOPSIS
 
