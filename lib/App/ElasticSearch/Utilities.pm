@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '1.2'; # VERSION
+our $VERSION = '1.3'; # VERSION
 
 use strict;
 use warnings;
@@ -155,7 +155,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 SYNOPSIS
 
@@ -218,6 +218,10 @@ The tools are all wrapped in their own documentation, please see:
     es-apply-settings.pl --help
 
 For individual options and capabilities
+
+=head2 CONTRIBUTORS
+
+    Mihai Oprea <mishu@mishulica.com>
 
 =head1 AUTHOR
 

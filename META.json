@@ -72,7 +72,7 @@
          "web" : "https://github.com/reyjrar/es-utils"
       }
    },
-   "version" : "1.2",
+   "version" : "1.3",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.016003"
