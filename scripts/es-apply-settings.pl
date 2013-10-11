@@ -10,7 +10,7 @@ BEGIN {
 }
 
 use DateTime;
-use ElasticSearch;
+use Elasticsearch::Compat;
 use JSON;
 use LWP::Simple;
 use Getopt::Long;
@@ -83,7 +83,7 @@ $TARGET .= ":$CFG{port}";
 debug("Target is: $TARGET");
 debug_var(\%CFG);
 
-my $es = ElasticSearch->new(
+my $es = Elasticsearch::Compat->new(
     servers   => [ $TARGET ],
     transport => 'http',
     timeout   => 0,     # Do Not Timeout
@@ -172,7 +172,7 @@ es-apply-settings.pl - Run to apply a JSON list of settings to indexes matching 
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 SYNOPSIS
 

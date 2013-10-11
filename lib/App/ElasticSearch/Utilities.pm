@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '1.3'; # VERSION
+our $VERSION = '1.4'; # VERSION
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ use Sub::Exporter -setup => {
 # Extract the basics from the command line
 my %opt = ();
 GetOptions(\%opt,
-    'color',
+    'color!',
     'csv',
     'verbose+',
     'debug',
@@ -155,7 +155,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 SYNOPSIS
 
@@ -222,6 +222,7 @@ For individual options and capabilities
 =head2 CONTRIBUTORS
 
     Mihai Oprea <mishu@mishulica.com>
+    Samit Badle
 
 =head1 AUTHOR
 

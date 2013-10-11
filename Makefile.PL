@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "scripts/es-daily-index-maintenance.pl",
     "scripts/es-metrics-to-graphite.pl",
     "scripts/es-nagios-check.pl",
+    "scripts/es-search.pl",
     "scripts/es-status.pl"
   ],
   "LICENSE" => "bsd",
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "DateTime" => 0,
-    "ElasticSearch" => 0,
+    "Elasticsearch::Compat" => 0,
     "File::Basename" => 0,
     "File::Spec" => 0,
     "FindBin" => 0,
@@ -38,6 +39,7 @@ my %WriteMakefileArgs = (
     "IO::Socket::INET" => 0,
     "IPC::Run3" => 0,
     "JSON" => 0,
+    "JSON::XS" => 0,
     "LWP::Simple" => 0,
     "MIME::Lite" => 0,
     "Pod::Usage" => 0,
@@ -49,13 +51,14 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "File::Find" => 0,
-    "File::Temp" => 0,
+    "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Pod::Coverage::TrustPod" => 0,
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "1.3",
+  "VERSION" => "1.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

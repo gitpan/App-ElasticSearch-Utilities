@@ -11,7 +11,7 @@ use warnings;
 
 use Carp;
 use DateTime;
-use ElasticSearch;
+use Elasticsearch::Compat;
 use File::Basename;
 use File::Spec;
 use FindBin;
@@ -53,7 +53,7 @@ if ( !defined($index) || !exists $OPT{from} || !exists $OPT{to} ) {
 # Connect to ElasticSearch
 my %ES = ();
 foreach my $dir (qw(from to)) {
-    $ES{$dir} = ElasticSearch->new(
+    $ES{$dir} = Elasticsearch::Compat->new(
         servers   => "$OPT{$dir}:9200",
         transport => 'http',
         timeout   => 0,
@@ -138,7 +138,7 @@ es-copy-index.pl - Copy an index from one cluster to another
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 SYNOPSIS
 

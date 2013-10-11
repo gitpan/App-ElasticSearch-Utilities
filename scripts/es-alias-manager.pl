@@ -10,7 +10,7 @@ BEGIN {
 }
 
 use DateTime;
-use ElasticSearch;
+use Elasticsearch::Compat;
 use YAML;
 use Getopt::Long;
 use Pod::Usage;
@@ -60,7 +60,7 @@ $TARGET .= ":$CFG{port}";
 debug("Target is: $TARGET");
 debug_var(\%CFG);
 
-my $es = ElasticSearch->new(
+my $es = Elasticsearch::Compat->new(
     servers   => [ $TARGET ],
     transport => 'http',
     timeout   => 0,     # Do Not Timeout
@@ -186,7 +186,7 @@ es-alias-manager.pl - Allow easy alias management for daily indexes
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 SYNOPSIS
 

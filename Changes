@@ -1,3 +1,644 @@
-Revision history for App-ElasticSearch-Utilities
+==================================================
+Changes from 2012-10-11 00:00:00 +0000 to present.
+==================================================
 
-1.3       2013-09-27 13:39:43 Europe/Amsterdam
+----------------------------------------
+version 1.4 at 2013-10-11 14:38:59 +0000
+----------------------------------------
+
+  Change: 25d2944bf709282a2008bb14cb20879a0740f00a
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-10-11 16:03:25 +0000
+
+    Build Changelog from Git 
+
+  Change: 404676e268aea31ab18b0466b7353ff57c3ab424
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-10-11 15:48:50 +0000
+
+    Move to Elasticsearch::Compat because ElasticSearch.pm is b0rked 
+
+  Change: 10c57c669db5fbce7e6f559a2dc7ad75acf62f3f
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-09-27 22:54:24 +0000
+
+    First revision of es-search utility included. 
+
+  Change: ac4507fca073b7c6c5fb2ebc30059c1755246b3e
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-09-27 13:40:30 +0000
+
+    Archive 1.3 release 
+
+----------------------------------------
+version 1.3 at 2013-09-27 11:39:39 +0000
+----------------------------------------
+
+  Change: 4d2e2ec66e6183897ca8a1d429e2b9dadd57fe97
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-09-27 13:39:39 +0000
+
+    Version 1.3 ready for release 
+
+  Change: 3fd621cf9939cccc97598730023028c83bd62d45
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-09-27 13:38:42 +0000
+
+    Migrate to the ElasticSearch.pm and App::ElasticSearch::Utilities 
+
+  Change: 39c68b4a5e208d1c4ee52afe207a5bfd3feae953
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-09-27 13:38:42 +0000
+
+    Documentation updated to reflect the reality of ES Index Naming 
+
+  Change: bc570558d5bf5304e96c26fc2566a8e318309d5b
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-09-26 14:05:28 +0000
+
+    Added contributors sections 
+
+  Change: 25103867d4537f8497b4201f6b633bf3947b9c25
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-09-26 14:03:06 +0000
+
+    Merged patch from Mihai Oprea <mishu@mishulica.com> on
+    graphite-scripts to this repository. 
+
+----------------------------------------
+version 1.2 at 2013-09-13 11:39:57 +0000
+----------------------------------------
+
+  Change: d6a7cc6ecf65ae503c657fb929edd3c737a60803
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-09-13 13:39:57 +0000
+
+    Fix output handling so it complies with the rest of the tools. Fixes
+    to documentation. 
+
+  Change: 9261c5244460042dcbe54fb0fa34732809dc576c
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-09 15:42:04 +0000
+
+    Archived 1.1 releasegit st 
+
+  Change: 4bde4b422845fe49fff4d10624a53f2d51b9022d
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-09 15:41:48 +0000
+
+    Version bumped to 1.1 
+
+  Change: e3ac43f268d19b9a3cacaeacc3045462f2c8250b
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-09 15:41:48 +0000
+
+    Added override() function to App::ElasticSearch::Utilities to
+    override verbose/debug outputs.
+
+    es-daily-index-maintenance.pl added a --dry-run which doesn't make
+    changes but enable verbose output and tells what it would do. Also
+    added replicas management to the script to manage aging replicas. 
+
+  Change: 12c99815a1b3824d07b65f867498874d1313a5dd
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-09 15:41:48 +0000
+
+    Start of the replica management pieces 
+
+  Change: 2b013d6a0c3896888463f3a93fd7a6e3440e9219
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-02 17:48:45 +0000
+
+    Archive 1.006 release 
+
+  Change: d2b50bbb75d03529329c6441337dccca3ef0b118
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-02 17:48:23 +0000
+
+    Version bump 
+
+  Change: aa5f486e21894c15cc50b574326b0787c6c54af7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2013-08-01 23:15:28 +0000
+
+    Cleanup unnecessary dependencies and migrate to JSON from JSON::XS 
+
+  Change: 518fb2e24956176aa6ac1060d85dbc275b8e6423
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 14:53:51 +0000
+
+    Archive the 1.005 release 
+
+  Change: 8192584e0c1c919a7bda1f0e5db999565c1ffb5a
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 14:53:18 +0000
+
+    Readme updated for version 1.005 
+
+  Change: 6b86d15fdafc584dc6ef544d21274992cd140335
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 14:53:18 +0000
+
+    Added new utility: es-apply-settings.pl
+
+    This script provides a way to apply index settings to all indexes
+    matching a pattern. It also provides a --close option to surround the
+    update settings call in a close/open for non-dynamic attribute
+    changes. 
+
+  Change: 97d0bc4e7e0feaaa7f69b6de32db5902f09f7d1f
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 14:53:18 +0000
+
+    Archive the 1.004 release 
+
+  Change: fb52c28f6ba7cce105589079f5f3f4bb5b91179b
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 18:28:35 +0000
+
+    Updated metrics for 0.90.x and add ability to rename indexes with
+    es-copy-index.pl 
+
+  Change: 5ed6299c52824a04302ed48b7f2c68b93fac191d
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 18:27:08 +0000
+
+    Add more stats available in 0.90.x 
+
+  Change: 33366de9fbe5474d5b254523d302964a148249cd
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 18:27:08 +0000
+
+    Allow setting of target index name 
+
+  Change: 585469a43f5f813af0f43f5398b738869eaab896
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 13:39:33 +0000
+
+    Added 1.003 to releases archive and removing older archives 
+
+  Change: fbbcff24b635a5824e2979e0b358482b80ddfbcf
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 13:34:46 +0000
+
+    Added older builds to releases archive 
+
+  Change: e5d397cfc3880eb8ba984ce12f0a289597fb48b8
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 13:33:31 +0000
+
+    Updated to version 1.003 
+
+----------------------------------------
+version 1.1 at 2013-08-09 13:38:10 +0000
+----------------------------------------
+
+  Change: 16557f96cce9527e31b7a49d8e6f7ebd32c90f24
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-09 15:38:10 +0000
+
+    Version bumped to 1.1 
+
+  Change: 5d6d9aa229abd25cad2a651ae4c247d51e877048
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-09 15:33:39 +0000
+
+    Archive 1.006 release 
+
+  Change: 87b120cb599aee9a95528173692589cb2f932ddf
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-09 15:33:39 +0000
+
+    Version bump 
+
+  Change: 3322322282aa99803fceaa92c3886bfcad0e2b26
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-09 15:32:06 +0000
+
+    Added override() function to App::ElasticSearch::Utilities to
+    override verbose/debug outputs.
+
+    es-daily-index-maintenance.pl added a --dry-run which doesn't make
+    changes but enable verbose output and tells what it would do. Also
+    added replicas management to the script to manage aging replicas. 
+
+  Change: 63298b345e8a122d2a22ba778ae38691705b1c2c
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-09 15:32:06 +0000
+
+    Start of the replica management pieces 
+
+------------------------------------------
+version 1.006 at 2013-08-02 15:47:32 +0000
+------------------------------------------
+
+  Change: d154d789a84f06d7ee05a53f22d4385c4cc82943
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-02 17:47:32 +0000
+
+    Version bump 
+
+  Change: 79958a27787aa39743d66075f5e1560e202bbe08
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2013-08-02 17:41:03 +0000
+
+    Cleanup unnecessary dependencies and migrate to JSON from JSON::XS 
+
+  Change: ac9d061ac4cd442ed8e8510cf490a3d910ae88ca
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-02 17:41:03 +0000
+
+    Archive the 1.005 release 
+
+  Change: 8f4f13efafaebd37271d2a8aaa43d7d4e26472c5
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-08-02 17:41:02 +0000
+
+    Readme updated for version 1.005 
+
+------------------------------------------
+version 1.005 at 2013-07-22 12:52:48 +0000
+------------------------------------------
+
+  Change: 90ad53bfe19cae662569816009364f70fb387634
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 14:52:48 +0000
+
+    Readme updated for version 1.005 
+
+  Change: 4d462a1e02c7c6a20ce18c8167d272031d0d7709
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 14:49:31 +0000
+
+    Added new utility: es-apply-settings.pl
+
+    This script provides a way to apply index settings to all indexes
+    matching a pattern. It also provides a --close option to surround the
+    update settings call in a close/open for non-dynamic attribute
+    changes. 
+
+  Change: 5edc400d423a3a5f191c94d73dc2078000a7b20b
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 11:13:35 +0000
+
+    Archive the 1.004 release 
+
+  Change: d4b24d6201abecb832dc5dcf88caf675ec25a1e6
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 11:13:35 +0000
+
+    Updated metrics for 0.90.x and add ability to rename indexes with
+    es-copy-index.pl 
+
+  Change: 23362a8d22184dd48ebb9d14d01ecf4ee547909e
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 11:13:34 +0000
+
+    Add more stats available in 0.90.x 
+
+  Change: 6b406eb99698646e83d49871f6f3874fc192831a
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 11:13:34 +0000
+
+    Added 1.003 to releases archive and removing older archives 
+
+  Change: a6fb5a0c0f6b9579d1dead5111b027a67b4d409a
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 11:13:34 +0000
+
+    Added older builds to releases archive 
+
+  Change: ead4c1f3f3b142da87a7ec4bdc4fc45eab06da0d
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-22 11:13:34 +0000
+
+    Updated to version 1.003 
+
+  Change: 39fd3ccc91b27f244537db68f0c928fb6262ff6e
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 18:21:47 +0000
+
+    Allow setting of target index name 
+
+------------------------------------------
+version 1.004 at 2013-07-19 16:28:35 +0000
+------------------------------------------
+
+  Change: fb52c28f6ba7cce105589079f5f3f4bb5b91179b
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 18:28:35 +0000
+
+    Updated metrics for 0.90.x and add ability to rename indexes with
+    es-copy-index.pl 
+
+  Change: 5ed6299c52824a04302ed48b7f2c68b93fac191d
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 18:27:08 +0000
+
+    Add more stats available in 0.90.x 
+
+  Change: 33366de9fbe5474d5b254523d302964a148249cd
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 18:27:08 +0000
+
+    Allow setting of target index name 
+
+  Change: 585469a43f5f813af0f43f5398b738869eaab896
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 13:39:33 +0000
+
+    Added 1.003 to releases archive and removing older archives 
+
+------------------------------------------
+version 1.003 at 2013-07-19 11:34:46 +0000
+------------------------------------------
+
+  Change: fbbcff24b635a5824e2979e0b358482b80ddfbcf
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 13:34:46 +0000
+
+    Added older builds to releases archive 
+
+  Change: e5d397cfc3880eb8ba984ce12f0a289597fb48b8
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 13:33:31 +0000
+
+    Updated to version 1.003 
+
+  Change: 3e9f69e52721b026e6619150d033e222f14b273b
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 13:28:47 +0000
+
+    Fixed reported bug where delete skips closed indices
+
+    - https://github.com/reyjrar/es-utils/issues/2
+
+    Allow the use of index names that include a datacenter designation. 
+
+  Change: 18dda79b18e01d5b5091ba18994e859de9f90462
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-19 13:21:17 +0000
+
+    Relative aliases configured to work properly, and more documentation 
+
+  Change: 9c86e08e7b008139c180dd896de61e0646b5dcfc
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-18 21:28:38 +0000
+
+    Alias manager created with daily alias working. 
+
+  Change: fa3521c859db2f84be0a28edfdb6ca89341dc753
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-07-18 17:38:52 +0000
+
+    Move basename determination to regex from a split 
+
+  Change: 0bd639e8f0f5ab50e3c51d8d60b12d129826701e
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 20:26:32 +0000
+
+    Fixed typo in Application name 
+
+  Change: c2297cea5e7eacc90d560754f5776745f01200e0
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 20:25:49 +0000
+
+    Fix typo in module name 
+
+  Change: 1dd64d92d0588136b0776e1ac4f2039d4cfc282c
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 20:22:22 +0000
+
+    Finally, 1.002 release archived. 
+
+------------------------------------------
+version 1.002 at 2013-06-21 18:21:23 +0000
+------------------------------------------
+
+  Change: 5b1412e0213bc861f2b2830195369d33e08c4e0a
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 20:21:23 +0000
+
+    Broken tree, this should fix it. 
+
+  Change: c213292198f8f12effee86d434f007a2d09787cb
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 20:20:16 +0000
+
+    Added 1.002 Release 
+
+  Change: 13108b0c8b1ff71d620a2b3144bd734504205d6d
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 20:19:29 +0000
+
+    Fix ordering of plugins 
+
+  Change: dc39d7e100f9068705bf9edbe82b89c501c699e7
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 20:16:46 +0000
+
+    Archive 1.001 release 
+
+  Change: 64786bdfa26d20217ca78950b1a862f4c63caec4
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 20:16:14 +0000
+
+    Enable UploadToCPAN 
+
+------------------------------------------
+version 1.001 at 2013-06-21 18:04:19 +0000
+------------------------------------------
+
+  Change: e166e9783c2ef07e6b58f87397116961d7328ee5
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 20:04:19 +0000
+
+    Fix versioning bugs and set recommended install to CPAN Minus 
+
+  Change: ef4e3afd7ed26650a65b1c4b9a6311dea8cef808
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 19:43:47 +0000
+
+    1.000 release archived 
+
+------------------------------------------
+version 1.000 at 2013-06-21 17:42:51 +0000
+------------------------------------------
+
+  Change: dc4ca03280c671e5498d61943addd50ca196aadd
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 19:42:51 +0000
+
+    testing .gitignore to unignore releases so they get tracked 
+
+  Change: d27c31bbd93d8415fb260c913cc9290e75b7fd3c
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 19:39:36 +0000
+
+    Use Git::NextVersion 
+
+  Change: e549a8c9ed8683b65a3773dc35bc25a7612471e0
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 19:37:12 +0000
+
+    Updated documentation to recommend using CPAN/CPANM for installation 
+
+  Change: 8aca674a23942f418fe621f8bd61f615db125c55
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 19:32:48 +0000
+
+    Added 0.999 release to archive. 
+
+------------------------------------------
+version 0.999 at 2013-06-21 17:29:58 +0000
+------------------------------------------
+
+  Change: b587dcd68c64d9fbceaa45618544ccb3ad14a22b
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-21 19:29:58 +0000
+
+    Bumped to 0.999 in the module 
+
+  Change: f9e28e52a1a034b5a349352e371b5d8a12984736
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-04 16:10:05 +0000
+
+    Shard state check updated to consider the initialization phase of
+    index creation and not throw a critical 
+
+  Change: 7ca429e220a163b06669cbe00e9d8d1cbbc5fce5
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-06-04 15:58:25 +0000
+
+    Comments added in the code 
+
+------------------------------------------
+version 0.900 at 2013-06-03 09:49:01 +0000
+------------------------------------------
+
+  Change: 167644d209b1d72070e41d8b8e887e3380fe9679
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-06-03 11:49:01 +0000
+
+    Version bumped to 0.900 and documentation updated to reflect changes. 
+
+  Change: 3469add46907acb7e75b826303f4b0dcce2d021d
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-06-03 11:49:00 +0000
+
+    Improve compatibility with ElasticSearch.pm API and ElasticSearch
+    versions (0.19 through 0.90) Sort indexes in segments output 
+
+  Change: b66da5eec631bf29dd19deaad1fc579b8da7024a
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-06-03 11:46:43 +0000
+
+    Renamed to App::ElasticSearch::Utilities Release to the CPAN and
+    enabled ArchiveReleases 
+
+------------------------------------------
+version 0.013 at 2013-02-18 19:27:18 +0000
+------------------------------------------
+
+  Change: 69449e5712aad07ce81dc153e5a65bf1572db7b1
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-02-18 20:27:18 +0000
+
+    Backed out of CPAN Upload, need to check namespaces 
+
+  Change: b9204e028a6cc475305a5e0b1d694f6e791ae2f9
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-02-18 20:26:01 +0000
+
+    Removed redudant POD 
+
+  Change: a3f2b70e21720b6dafcfb525d3390a334e9a9111
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-02-18 17:27:41 +0000
+
+    Release to the CPAN 
+
+  Change: 984ef7059cc6d87094fa6953ffcc8c8e9ea01227
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-02-18 17:23:46 +0000
+
+    Changed verbosity levels in es-status.pl 
+
+  Change: fbc14b828728ea480d85853957d88c205c11d6d1
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-02-18 17:09:54 +0000
+
+    Added es-copy-index.pl to the scripts. 
+
+  Change: 9933f443edee237ec4534456587b1888187effa6
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-02-07 12:09:56 +0000
+
+    Name change 
+
+------------------------------------------
+version 0.012 at 2013-02-06 12:40:26 +0000
+------------------------------------------
+
+  Change: 4e8584faf76853cb7ab8bf299cb2e0035b376fa9
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-02-06 13:40:26 +0000
+
+    Removed Try::Tiny Changed the name of es-logstash-maintenance.pl
+    Bumped version to 0.12 
+
+  Change: df48c4c19533b3fb8c7a79254fd6f992c34f4174
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-02-06 13:38:33 +0000
+
+    Removal of Try::Tiny 
+
+------------------------------------------
+version 0.011 at 2012-12-31 14:32:05 +0000
+------------------------------------------
+
+  Change: b8f777eeeb56ca5ff829e45bab7a6bd9d7717e8c
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2012-12-31 15:32:05 +0000
+
+    README updated 
+
+  Change: eec9ba4c05beef906dece7faab543d4128b73183
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2012-12-31 15:29:58 +0000
+
+    LogStash Maintenance script using es::utils for output functions. 
+
+  Change: 12fbe5d0a69e7d9686dcf099413b80cc8f1a555f
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2012-12-31 15:29:02 +0000
+
+    Moved utility functions into the es::utils module. 
+
+  Change: 99ef77b6570c9d357bc32c5a72bea8f3c07aa30d
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2012-12-29 11:55:01 +0000
+
+    Moving terminal output commands into es::util 
+
+  Change: 81b19487823391bcc875c8384889d27a3ab5166f
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2012-12-28 19:02:20 +0000
+
+    README regeneration from build 
+
+  Change: 7555ed0ff16484a3ab54ce39f5d9a8254c37c7c1
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2012-12-28 18:50:07 +0000
+
+    Added utility for handling maintenance of logging indices 
+
+  Change: 6153a18ec0b0e830b55ab6e14bcab872ec85efeb
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2012-07-17 23:03:50 +0000
+
+    Deleted 0.008, added 0.010 
+
+=================================================
+Plus 10 releases after 2012-10-11 00:00:00 +0000.
+=================================================
