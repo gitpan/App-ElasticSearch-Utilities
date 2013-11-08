@@ -24,7 +24,8 @@ my %WriteMakefileArgs = (
     "scripts/es-metrics-to-graphite.pl",
     "scripts/es-nagios-check.pl",
     "scripts/es-search.pl",
-    "scripts/es-status.pl"
+    "scripts/es-status.pl",
+    "scripts/es-storage-data.pl"
   ],
   "LICENSE" => "bsd",
   "NAME" => "App::ElasticSearch::Utilities",
@@ -47,6 +48,7 @@ my %WriteMakefileArgs = (
     "Sys::Hostname" => 0,
     "Term::ANSIColor" => 0,
     "YAML" => 0,
+    "feature" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -58,7 +60,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "1.4",
+  "VERSION" => "1.5",
   "test" => {
     "TESTS" => "t/*.t"
   }

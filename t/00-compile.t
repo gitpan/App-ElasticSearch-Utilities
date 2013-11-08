@@ -3,7 +3,7 @@ use warnings;
 
 # this test was generated with Dist::Zilla::Plugin::Test::Compile 2.034
 
-use Test::More  tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More  tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 
 
@@ -19,7 +19,8 @@ my @scripts = (
     'scripts/es-metrics-to-graphite.pl',
     'scripts/es-nagios-check.pl',
     'scripts/es-search.pl',
-    'scripts/es-status.pl'
+    'scripts/es-status.pl',
+    'scripts/es-storage-data.pl'
 );
 
 # no fake home requested

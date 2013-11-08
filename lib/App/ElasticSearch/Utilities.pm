@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '1.4'; # VERSION
+our $VERSION = '1.5'; # VERSION
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ my %DEF = (
     DEBUG       => $opt{debug} || 0,
     VERBOSE     => $opt{verbose} || 0,
     COLOR       => $opt{color} || git_color_check(),
-    KV_FORMART  => $opt{csv} ? ',' : ':',
+    KV_FORMAT   => $opt{csv} ? ',' : ': ',
     QUIET       => $opt{quiet} || 0,
 );
 debug_var(\%DEF);
@@ -155,7 +155,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 SYNOPSIS
 
@@ -172,6 +172,7 @@ Included is:
     scripts/es-copy-index.pl - Copy an index from one cluster to another
     scripts/es-alias-manager.pl - Manage index aliases automatically
     scripts/es-apply-settings.pl - Apply settings to all indexes matching a pattern
+    scripts/es-storage-data.pl - View how shards/data is aligned on your cluster
 
 The App::ElasticSearch::Utilities module simply serves as a wrapper around the scripts for packaging and
 distribution.
@@ -216,6 +217,7 @@ The tools are all wrapped in their own documentation, please see:
     es-copy-index.pl --help
     es-alias-manager.pl --help
     es-apply-settings.pl --help
+    es-storage-data.pl --help
 
 For individual options and capabilities
 

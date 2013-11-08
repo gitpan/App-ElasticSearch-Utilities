@@ -1,9 +1,38 @@
 ==================================================
-Changes from 2012-10-11 00:00:00 +0000 to present.
+Changes from 2012-11-08 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 1.4 at 2013-10-11 14:38:59 +0000
+version 1.5 at 2013-11-08 12:50:59 +0000
+----------------------------------------
+
+  Change: b0b0e0416a66f08de73390959e6402d1a5d5e1cc
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-11-08 12:50:43 +0000
+
+    New Utility, bump to 1.5 
+
+  Change: 0a084d3c02f9662a1159605d0c2c2aed40ed36c6
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-11-08 13:03:12 +0000
+
+    Created the es-storage-data.pl utility to view the distribution of
+    shards, documents, and overall sizes to the Utilities. 
+
+  Change: cbcddb4ecbdc311a479225b25c742aef2410c3ba
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-11-08 13:03:12 +0000
+
+    Removed old releases 
+
+  Change: e1797753f43c048ca44d46a5e8739b7ba356901b
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-10-11 14:41:22 +0000
+
+    Added releaseee 1.4 
+
+----------------------------------------
+version 1.4 at 2013-10-11 14:03:25 +0000
 ----------------------------------------
 
   Change: 25d2944bf709282a2008bb14cb20879a0740f00a
@@ -640,5 +669,5 @@ version 0.011 at 2012-12-31 14:32:05 +0000
     Deleted 0.008, added 0.010 
 
 =================================================
-Plus 10 releases after 2012-10-11 00:00:00 +0000.
+Plus 10 releases after 2012-11-08 00:00:00 +0000.
 =================================================

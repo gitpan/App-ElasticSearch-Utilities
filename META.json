@@ -46,6 +46,7 @@
             "Sys::Hostname" : "0",
             "Term::ANSIColor" : "0",
             "YAML" : "0",
+            "feature" : "0",
             "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
@@ -74,7 +75,7 @@
          "web" : "https://github.com/reyjrar/es-utils"
       }
    },
-   "version" : "1.4",
+   "version" : "1.5",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.016002"

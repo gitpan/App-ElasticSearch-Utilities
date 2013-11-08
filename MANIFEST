@@ -15,6 +15,7 @@ scripts/es-metrics-to-graphite.pl
 scripts/es-nagios-check.pl
 scripts/es-search.pl
 scripts/es-status.pl
+scripts/es-storage-data.pl
 t/00-compile.t
 xt/author/critic.t
 xt/release/eol.t
