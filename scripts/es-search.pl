@@ -227,7 +227,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 1.6
+version 2.1
 
 =head1 SYNOPSIS
 
