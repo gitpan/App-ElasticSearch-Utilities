@@ -14,9 +14,9 @@ my @module_files = (
 my @scripts = (
     'scripts/es-alias-manager.pl',
     'scripts/es-apply-settings.pl',
-    'scripts/es-copy-index.pl',
     'scripts/es-daily-index-maintenance.pl',
-    'scripts/es-metrics-to-graphite.pl',
+    'scripts/es-graphite-dynamic.pl',
+    'scripts/es-graphite-static.pl',
     'scripts/es-nagios-check.pl',
     'scripts/es-search.pl',
     'scripts/es-status.pl',

@@ -4,26 +4,18 @@
 use strict;
 use warnings;
 
-BEGIN {
-    # Clear out any proxy settings
-    delete $ENV{$_} for qw(http_proxy HTTP_PROXY);
-}
-
 use DateTime;
-use Elasticsearch::Compat;
 use YAML;
-use Getopt::Long;
+use Getopt::Long qw(:config no_ignore_case no_ignore_case_always);
 use Pod::Usage;
-use App::ElasticSearch::Utilities qw(:all);
+use CLI::Helpers qw(:all);
+use App::ElasticSearch::Utilities qw(:default);
 
 #------------------------------------------------------------------------#
 # Argument Collection
 my %opt;
 GetOptions(\%opt,
-    'local',
     'all',
-    'host:s',
-    'port:i',
     'config:s',
     # Basic options
     'help|h',
@@ -35,14 +27,8 @@ GetOptions(\%opt,
 pod2usage(1) if $opt{help};
 pod2usage(-exitstatus => 0, -verbose => 2) if $opt{manual};
 
-#------------------------------------------------------------------------#
-# Host or Local
-pod2usage(1) unless defined $opt{local} or defined $opt{host};
-
 my %CFG = (
-    host               => undef,
-    port               => 9200,
-    config             => '/etc/elasticsearch/aliases.yml',
+    config => '/etc/elasticsearch/aliases.yml',
 
 );
 # Extract from our options if we've overridden defaults
@@ -56,19 +42,13 @@ my $ALIAS = YAML::LoadFile( $CFG{config} ) or die "unable to read $CFG{config}";
 
 # Create the target uri for the ES Cluster
 my $TARGET = exists $opt{host} && defined $opt{host} ? $opt{host} : 'localhost';
-$TARGET .= ":$CFG{port}";
-debug("Target is: $TARGET");
-debug_var(\%CFG);
 
-my $es = Elasticsearch::Compat->new(
-    servers   => [ $TARGET ],
-    transport => 'http',
-    timeout   => 0,     # Do Not Timeout
-);
+# Grab a connection to ElasticSearch
+my $es = es_connect();
 
 # Delete Indexes older than a certain point
 my $TODAY = DateTime->now()->truncate( to => 'day' );
-my $indices= $es->get_aliases();
+my $indices = es_request('_aliases');
 
 if ( !defined $indices ) {
     output({color=>"red"}, "Unable to locate indices by get_aliases()!");
@@ -128,10 +108,12 @@ debug_var($ALIAS);
 foreach my $index (sort keys %{ $indices }) {
     debug("$index being evaluated");
     my %current = %{ $indices->{$index}{aliases}};
+    my $managed = 0;
 
     my %desired = ();
     while( my($name,$map) = each %{ $ALIAS }) {
         if ($index =~ /$map->{re}/) {
+            $managed++;
             my $idx_dt = DateTime->new( map { $_ => $+{$_} } qw(year month day) );
             verbose("$index is a $name index.");
 
@@ -156,18 +138,20 @@ foreach my $index (sort keys %{ $indices }) {
     }
     my @updates = ();
     my %checks = map { $_ => 1 } keys(%desired),keys(%current);
-    foreach my $alias (keys %checks) {
-        if( exists $desired{$alias} && exists $current{$alias} ) {
-            next;
+    if( $managed ) {
+        foreach my $alias (keys %checks) {
+            if( exists $desired{$alias} && exists $current{$alias} ) {
+                next;
+            }
+            my $action =  exists $desired{$alias} ? 'add' : 'remove';
+            push @updates, { $action => { index => $index, alias => $alias} };
+            verbose({color=>'cyan'}, "$index: $action alias '$alias'");
         }
-        my $action =  exists $desired{$alias} ? 'add' : 'remove';
-        push @updates, { $action => { index => $index, alias => $alias} };
-        verbose({color=>'cyan'}, "$index: $action alias '$alias'");
     }
     debug({color=>'magenta'}, "Aliases for $index : " . join(',', keys %desired) );
     if( @updates ) {
         eval {
-            $es->aliases( actions => \@updates );
+            es_request('_aliases', { method => 'POST' }, { actions => \@updates });
             output({color=>'green'}, "Updates applied for $index : " . join(',', keys %desired) );
         };
         if( my $err = $@ ){
@@ -186,7 +170,7 @@ es-alias-manager.pl - Allow easy alias management for daily indexes
 
 =head1 VERSION
 
-version 1.5
+version 1.6
 
 =head1 SYNOPSIS
 
@@ -197,11 +181,13 @@ Options:
     --help              print help
     --manual            print full manual
     --config            Location of Config File, default /etc/elasticsearch/aliases.yml
-    --local             Poll localhost and use name reported by ES
-    --host|-H           Host to poll for statistics
-    --local             Assume localhost as the host
-    --quiet             Ideal for running on cron, only outputs errors
-    --verbose           Send additional messages to STDERR
+
+From CLI::Helpers:
+
+    --color             Boolean, enable/disable color, default use git settings
+    --verbose           Incremental, increase verbosity
+    --debug             Show developer output
+    --quiet             Show no output (for cron)
 
 =head1 DESCRIPTION
 
@@ -287,29 +273,9 @@ For relative period indices, the following variable is B<required>.
 
 =over 8
 
-=item B<help>
-
-Print this message and exit
-
-=item B<manual>
-
-Print this message and exit
-
 =item B<config>
 
 Location of the config file, default is /etc/elasticsearch/aliases.yml
-
-=item B<local>
-
-Optional, operate on localhost (if not specified, --host required)
-
-=item B<host>
-
-Optional, the host to maintain (if not specified --local required)
-
-=item B<verbose>
-
-Verbose stats to STDERR
 
 =back
 

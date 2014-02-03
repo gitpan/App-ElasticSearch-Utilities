@@ -28,23 +28,16 @@
       },
       "runtime" : {
          "requires" : {
+            "CLI::Helpers" : "0",
             "Carp" : "0",
             "DateTime" : "0",
-            "Elasticsearch::Compat" : "0",
-            "File::Basename" : "0",
-            "File::Spec" : "0",
-            "FindBin" : "0",
+            "Elastijk" : "0",
             "Getopt::Long" : "0",
             "IO::Socket::INET" : "0",
-            "IPC::Run3" : "0",
-            "JSON" : "0",
             "JSON::XS" : "0",
-            "LWP::Simple" : "0",
-            "MIME::Lite" : "0",
             "Pod::Usage" : "0",
             "Sub::Exporter" : "0",
-            "Sys::Hostname" : "0",
-            "Term::ANSIColor" : "0",
+            "Time::Local" : "0",
             "YAML" : "0",
             "feature" : "0",
             "perl" : "5.010",
@@ -75,7 +68,7 @@
          "web" : "https://github.com/reyjrar/es-utils"
       }
    },
-   "version" : "1.5",
+   "version" : "1.6",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.016002"

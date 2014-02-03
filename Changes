@@ -1,9 +1,233 @@
 ==================================================
-Changes from 2012-11-08 00:00:00 +0000 to present.
+Changes from 2013-02-03 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 1.5 at 2013-11-08 12:50:59 +0000
+version 1.6 at 2014-02-03 17:40:34 +0000
+----------------------------------------
+
+  Change: 78b99d8ce0e136dcb6efdf08b96c9cc67f8289fb
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-02-03 17:40:08 +0000
+
+    Bumping version to 2.1 
+
+  Change: 20c0fe8790259324823893b67f663a3e852724d7
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-02-03 18:35:02 +0000
+
+    Disabled parameter ordering bug and tidied up a few file headers 
+
+  Change: 6d387f14d3807231f16badd1eca2a2528661afb4
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-02-03 18:34:22 +0000
+
+    Fixed bug in the incorrect parameters names 
+
+  Change: 4e3f726a937c22243f016d207df384aa84a3b412
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-02-03 18:15:42 +0000
+
+    Fixes for broken es-storage-data.pl exported methods 
+
+  Change: 8fda277701330e45be3cc7fa59b06d22acb23c6d
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-02-03 15:53:11 +0000
+
+    Add short YAML file names to search path 
+
+  Change: 8a39db706946c920272411a9cb7fbd600ffa620e
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-02-03 15:43:40 +0000
+
+    Remove copy index script til I can replace it with a version using
+    Elastijk 
+
+  Change: f642d2345ad55b1668f11163eb0a0605c976bbfa
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-02-03 13:17:35 +0000
+
+    Merge branch 'master' of github.com:reyjrar/es-utils
+
+    Conflicts:
+
+    scripts/es-apply-settings.pl
+
+    scripts/es-copy-index.pl
+
+    scripts/es-daily-index-maintenance.pl
+
+    scripts/es-nagios-check.pl
+
+    scripts/es-search.pl
+
+    scripts/es-status.pl
+
+    scripts/es-storage-data.pl 
+
+  Change: 8421b842c0834af6b77e03da74ed559df60d64c2
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-02-03 12:22:03 +0000
+
+    Merge branch 'feature/use-cli-helpers'
+
+    Conflicts:
+
+    README.mkdn
+
+    lib/App/ElasticSearch/Utilities.pm
+
+    scripts/es-apply-settings.pl
+
+    scripts/es-copy-index.pl
+
+    scripts/es-daily-index-maintenance.pl
+
+    scripts/es-search.pl
+
+    scripts/es-status.pl
+
+    scripts/es-storage-data.pl 
+
+  Change: f90d4c0f2291506b6bb326c382ff34c250d6c30e
+  Author: Takumi Sakamoto <takumi.saka@gmail.com>
+  Date : 2014-02-03 11:43:35 +0000
+
+    Use Getopt::Long with recommended options 
+
+  Change: 9be00d4b3ad6b39451e912da81a10e1df437eb1a
+  Author: Jason Rojas <jason.rojas@mgo.com>
+  Date : 2014-02-03 11:43:35 +0000
+
+    adding regex test 
+
+  Change: ca2b029bb020c0e7a5bbce35e9988a1dafc3b479
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-02-02 17:19:51 +0000
+
+    Major overhaul, bumping to version 2.0 * Converted to use Elastijk
+    and CLI::Helpers * Added global argument parsing for connection
+    options and
+
+    index selection options added to App::ElasticSearch::Utilities *
+    Options can be set from YAML files at the locations:
+
+    * /etc/es-utils.yml
+
+    * $HOME/.es-utils.yml * All utilities converted to use
+    App::ElasticSearch::Utilities methods. 
+
+  Change: 4a9468833aebce8f00974beced624cbcf16a59fd
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-01-24 18:00:40 +0000
+
+    Fixed broken datetime math with Time::Local 
+
+  Change: 03ce9f1e4e667becd87f33cd22bd0d27982a7b06
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-01-24 16:50:40 +0000
+
+    Metrics to graphite working with CLI::Helpers and
+    App::ElasticSearch::Utilities 
+
+  Change: 2e3eb70e78d912954bd40ecfd2886a376b04e777
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-01-24 16:31:54 +0000
+
+    Converted es-status.pl to work with the CLI::Helpers and
+    App::ElasticSearch::Utilities 
+
+  Change: bedc09ff8749ccb1636eb4553f957d8e4e11cb5a
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-01-24 15:51:32 +0000
+
+    Load defaults from YAML files so we don't have to specify everything. 
+
+  Change: b70c296ff532d6f7fa33e02ac57036c67b79c57d
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2014-01-08 11:28:16 +0000
+
+    Merge pull request #5 from takus/topic_getopt
+
+    Use Getopt::Long with recommended options 
+
+  Change: c5d88d31267b3b5d764f688e16c222dbbc462dbf
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2014-01-08 11:27:15 +0000
+
+    Merge pull request #4 from jasonrojas/basename_regex
+
+    adding regex test 
+
+  Change: 51c0f9ab39ee2861e2b08943adeae7833ab61227
+  Author: Takumi Sakamoto <takumi.saka@gmail.com>
+  Date : 2014-01-08 13:33:56 +0000
+
+    Use Getopt::Long with recommended options 
+
+  Change: 51cc00b28916abe843890232d2b95de969d8162c
+  Author: Jason Rojas <jason.rojas@mgo.com>
+  Date : 2014-01-07 12:54:42 +0000
+
+    adding regex test 
+
+  Change: dee5d89d754e4f24cf12069a104a9c9dedeea251
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-11-27 18:35:55 +0000
+
+    Fixed horrible broken things 
+
+  Change: 105ffe06513cff632ad3f1f01b408f2efe1c64f2
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2013-11-17 21:34:05 +0000
+
+    First draft ripping everything out and into the correct modules 
+
+  Change: f98d2a348dc4898a55fcc3b825a91cffa19207ee
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2013-11-17 16:09:53 +0000
+
+    First revision moving to CLI::Helpers and unifying the interface 
+
+  Change: 54565340d5e64224defa5363c4cea83dfa60c8a9
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-11-08 15:06:43 +0000
+
+    Archive the 1.5 release, remove the 1.1 
+
+  Change: c9dcc5329d9343c791622004165adc08afe317e4
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-11-08 15:59:53 +0000
+
+    Archive the 1.5 release, remove the 1.1 
+
+  Change: 0c5e89421baa349b89a2b1ee1530809a6018b53d
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-11-08 15:59:52 +0000
+
+    New Utility, bump to 1.5 
+
+  Change: ec6313c0c7cb760bb7b5d353444354db89a81472
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2013-11-08 15:59:52 +0000
+
+    Added releaseee 1.4 
+
+  Change: 145a59ad5263d40655bff4543ae68278dbce7744
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-11-08 13:02:14 +0000
+
+    Created the es-storage-data.pl utility to view the distribution of
+    shards, documents, and overall sizes to the Utilities. 
+
+  Change: 020a27dbd7f26ad96dab1a61ac7468b7947a8c83
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2013-11-06 16:21:10 +0000
+
+    Removed old releases 
+
+----------------------------------------
+version 1.5 at 2013-11-08 12:50:43 +0000
 ----------------------------------------
 
   Change: b0b0e0416a66f08de73390959e6402d1a5d5e1cc
@@ -622,52 +846,6 @@ version 0.012 at 2013-02-06 12:40:26 +0000
 
     Removal of Try::Tiny 
 
-------------------------------------------
-version 0.011 at 2012-12-31 14:32:05 +0000
-------------------------------------------
-
-  Change: b8f777eeeb56ca5ff829e45bab7a6bd9d7717e8c
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2012-12-31 15:32:05 +0000
-
-    README updated 
-
-  Change: eec9ba4c05beef906dece7faab543d4128b73183
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2012-12-31 15:29:58 +0000
-
-    LogStash Maintenance script using es::utils for output functions. 
-
-  Change: 12fbe5d0a69e7d9686dcf099413b80cc8f1a555f
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2012-12-31 15:29:02 +0000
-
-    Moved utility functions into the es::utils module. 
-
-  Change: 99ef77b6570c9d357bc32c5a72bea8f3c07aa30d
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2012-12-29 11:55:01 +0000
-
-    Moving terminal output commands into es::util 
-
-  Change: 81b19487823391bcc875c8384889d27a3ab5166f
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2012-12-28 19:02:20 +0000
-
-    README regeneration from build 
-
-  Change: 7555ed0ff16484a3ab54ce39f5d9a8254c37c7c1
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2012-12-28 18:50:07 +0000
-
-    Added utility for handling maintenance of logging indices 
-
-  Change: 6153a18ec0b0e830b55ab6e14bcab872ec85efeb
-  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
-  Date : 2012-07-17 23:03:50 +0000
-
-    Deleted 0.008, added 0.010 
-
 =================================================
-Plus 10 releases after 2012-11-08 00:00:00 +0000.
+Plus 11 releases after 2013-02-03 00:00:00 +0000.
 =================================================

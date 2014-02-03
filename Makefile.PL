@@ -19,9 +19,9 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "scripts/es-alias-manager.pl",
     "scripts/es-apply-settings.pl",
-    "scripts/es-copy-index.pl",
     "scripts/es-daily-index-maintenance.pl",
-    "scripts/es-metrics-to-graphite.pl",
+    "scripts/es-graphite-dynamic.pl",
+    "scripts/es-graphite-static.pl",
     "scripts/es-nagios-check.pl",
     "scripts/es-search.pl",
     "scripts/es-status.pl",
@@ -30,23 +30,16 @@ my %WriteMakefileArgs = (
   "LICENSE" => "bsd",
   "NAME" => "App::ElasticSearch::Utilities",
   "PREREQ_PM" => {
+    "CLI::Helpers" => 0,
     "Carp" => 0,
     "DateTime" => 0,
-    "Elasticsearch::Compat" => 0,
-    "File::Basename" => 0,
-    "File::Spec" => 0,
-    "FindBin" => 0,
+    "Elastijk" => 0,
     "Getopt::Long" => 0,
     "IO::Socket::INET" => 0,
-    "IPC::Run3" => 0,
-    "JSON" => 0,
     "JSON::XS" => 0,
-    "LWP::Simple" => 0,
-    "MIME::Lite" => 0,
     "Pod::Usage" => 0,
     "Sub::Exporter" => 0,
-    "Sys::Hostname" => 0,
-    "Term::ANSIColor" => 0,
+    "Time::Local" => 0,
     "YAML" => 0,
     "feature" => 0,
     "strict" => 0,
@@ -60,7 +53,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "1.5",
+  "VERSION" => "1.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
