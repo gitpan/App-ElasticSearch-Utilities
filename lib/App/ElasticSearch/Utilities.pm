@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '2.1'; # VERSION
+our $VERSION = '2.2'; # VERSION
 
 use strict;
 use warnings;
@@ -43,6 +43,7 @@ use Sub::Exporter -setup => {
         es_delete_index
         es_optimize_index
         es_apply_index_settings
+        es_facet_whitelist
     )],
     groups => {
         default => [qw(es_connect es_indices es_request)],
@@ -496,6 +497,23 @@ sub es_node_stats {
 }
 
 
+my %_facet_whitelist = ();
+sub es_facet_whitelist {
+    my ($field) = @_;
+    if( !keys %_facet_whitelist ) {
+        if( exists $_GLOBALS{facet_whitelist} && ref $_GLOBALS{facet_whitelist} eq 'ARRAY') {
+            %_facet_whitelist = map { $_ => 1 } @{ $_GLOBALS{facet_whitelist} };
+        }
+        else {
+            %_facet_whitelist = ( __ANY__ => 1 );
+        }
+    }
+    return 1 if exists $_facet_whitelist{__ANY__};
+    return exists $_facet_whitelist{$field};
+}
+
+
+
 sub def {
     my($key)= map { uc }@_;
 
@@ -517,7 +535,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 2.1
+version 2.2
 
 =head1 SYNOPSIS
 
@@ -537,6 +555,7 @@ B<MONITORING>:
     scripts/es-graphite-dynamic.pl - Perform index maintenance on daily indexes
     scripts/es-status.pl - Command line utility for ES Metrics
     scripts/es-storage-data.pl - View how shards/data is aligned on your cluster
+    scripts/es-nodes.pl - View node information
 
 B<MAINTENANCE>:
 
@@ -657,6 +676,36 @@ Returns a hashref
 Exposes GET /_nodes/stats
 
 Returns a hashref
+
+=head2 es_facet_whitelist('field name')
+
+Returns if the field is whitelisted
+
+Facet whitelists must be set in a configuration file.  Currently, the
+search path for config files is
+
+    /etc/es-utils.yaml
+    /etc/es-utils.yml
+    $ENV{HOME}/.es-utils.yaml
+    $ENV{HOME}/.es-utils.yml
+
+This does mean that users can override the whitelist, but this is by design.  If one of those
+files does not specify a facet_whitelist element as an array, the whitelist is not restricted.
+
+Examples:
+
+---
+facet_whitelist:
+  - src_ip
+  - src_ip_country
+  - dst_ip
+  - dst_ip_country
+  - file
+  - filetype
+  - program
+  - status
+  - method
+  - protocol
 
 =head2 def('key')
 

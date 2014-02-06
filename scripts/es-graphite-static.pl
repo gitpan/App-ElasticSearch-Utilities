@@ -327,7 +327,7 @@ es-graphite-static.pl - Gather performance metrics from an ES node and send them
 
 =head1 VERSION
 
-version 2.1
+version 2.2
 
 =head1 SYNOPSIS
 

@@ -15,6 +15,7 @@ scripts/es-daily-index-maintenance.pl
 scripts/es-graphite-dynamic.pl
 scripts/es-graphite-static.pl
 scripts/es-nagios-check.pl
+scripts/es-nodes.pl
 scripts/es-search.pl
 scripts/es-status.pl
 scripts/es-storage-data.pl

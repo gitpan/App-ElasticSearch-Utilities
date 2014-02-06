@@ -1,9 +1,44 @@
 ==================================================
-Changes from 2013-02-03 00:00:00 +0000 to present.
+Changes from 2013-02-06 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 1.6 at 2014-02-03 17:40:08 +0000
+version 2.2 at 2014-02-06 09:13:33 +0000
+----------------------------------------
+
+  Change: e297721850739dbedbfbf0f423819a47dd624f44
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-02-06 09:13:02 +0000
+
+    Documentation updates and version bump to 2.2 
+
+  Change: 4d9d91c0539015794f7a1f0e5adb4c58936581f2
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-02-05 20:44:51 +0000
+
+    Added --top functionality. 
+
+  Change: 4175c49ac9c79a7cd797fbae89745e2111f6cd33
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-02-05 20:15:43 +0000
+
+    This release actually works with --tail 
+
+  Change: cacf968100af9587086a31036cf501fdd5ff188b
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-02-05 19:41:13 +0000
+
+    Show master node in es-status.pl Setup up facet whitelist for
+    faceting searches in es-search.pl 
+
+  Change: b6a303583d58fa2db9dbdd54d6bdb4a8bb545343
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-02-03 17:48:06 +0000
+
+    Archiving release 2.1 for prosperity 
+
+----------------------------------------
+version 2.1 at 2014-02-03 17:40:08 +0000
 ----------------------------------------
 
   Change: 78b99d8ce0e136dcb6efdf08b96c9cc67f8289fb
@@ -847,5 +882,5 @@ version 0.012 at 2013-02-06 12:40:26 +0000
     Removal of Try::Tiny 
 
 =================================================
-Plus 11 releases after 2013-02-03 00:00:00 +0000.
+Plus 11 releases after 2013-02-06 00:00:00 +0000.
 =================================================

@@ -3,7 +3,7 @@ use warnings;
 
 # this test was generated with Dist::Zilla::Plugin::Test::Compile 2.034
 
-use Test::More  tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More  tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 
 
@@ -18,6 +18,7 @@ my @scripts = (
     'scripts/es-graphite-dynamic.pl',
     'scripts/es-graphite-static.pl',
     'scripts/es-nagios-check.pl',
+    'scripts/es-nodes.pl',
     'scripts/es-search.pl',
     'scripts/es-status.pl',
     'scripts/es-storage-data.pl'

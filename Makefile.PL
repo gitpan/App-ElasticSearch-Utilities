@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "scripts/es-graphite-dynamic.pl",
     "scripts/es-graphite-static.pl",
     "scripts/es-nagios-check.pl",
+    "scripts/es-nodes.pl",
     "scripts/es-search.pl",
     "scripts/es-status.pl",
     "scripts/es-storage-data.pl"
@@ -32,11 +33,13 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "CLI::Helpers" => 0,
     "Carp" => 0,
+    "Data::Dumper" => 0,
     "DateTime" => 0,
     "Elastijk" => 0,
     "Getopt::Long" => 0,
     "IO::Socket::INET" => 0,
     "JSON::XS" => 0,
+    "POSIX" => 0,
     "Pod::Usage" => 0,
     "Sub::Exporter" => 0,
     "Time::Local" => 0,
@@ -53,7 +56,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "2.1",
+  "VERSION" => "2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -217,7 +217,7 @@ es-nagios-check.pl - ElasticSearch Nagios Checks
 
 =head1 VERSION
 
-version 2.1
+version 2.2
 
 =head1 SYNOPSIS
 
