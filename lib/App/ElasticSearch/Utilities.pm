@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '2.2'; # VERSION
+our $VERSION = '2.3'; # VERSION
 
 use strict;
 use warnings;
@@ -86,8 +86,8 @@ foreach my $config_file (@_CONFIGS) {
 my %DEF = (
     # Connection Options
     HOST        => exists $opt{host} ? $opt{host} :
-                   exists $_GLOBALS{host} ? $_GLOBALS{host} :
-                   exists $opt{local} ? 'localhost' : 'localhost',
+                   exists $opt{local} ? 'localhost' :
+                   exists $_GLOBALS{host} ? $_GLOBALS{host} : 'localhost',
     PORT        => exists $opt{port} ? $opt{port} :
                    exists $_GLOBALS{port} ? $_GLOBALS{port} : 9200,
     TIMEOUT     => exists $opt{timeout} ? $opt{timeout} :
@@ -210,8 +210,12 @@ sub es_request {
     }
     $options->{index} = $index if $index ne 'NoIndex';
 
+    # Figure out if we're modifying things
+    my $modification = $url eq '_search' && $options->{method} eq 'POST' ? 0
+                     : $options->{method} ne 'GET';
+
     my ($status,$res);
-    if( $DEF{NOOP} && $options->{method} ne 'GET' ) {
+    if( $DEF{NOOP} && $modification) {
         output({color=>'cyan'}, "Called es_request($index / $options->{command}), but --noop and method is $options->{method}");
         return;
     }
@@ -529,13 +533,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 2.2
+version 2.3
 
 =head1 SYNOPSIS
 

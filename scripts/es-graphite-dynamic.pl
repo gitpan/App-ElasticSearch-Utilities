@@ -184,13 +184,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 es-graphite-dynamic.pl - Dynamically gather metrics and send to graphite
 
 =head1 VERSION
 
-version 2.2
+version 2.3
 
 =head1 SYNOPSIS
 
@@ -206,6 +208,16 @@ Options:
     --carbon-proto      Protocol for to use for Carbon (Default: tcp)
     --with-indices      Also send individual index stats
     --ignore            Comma separated list of keys to ignore in collection
+
+From App::ElasticSearch::Utilities:
+
+    --local         Use localhost as the elasticsearch host
+    --host          ElasticSearch host to connect to
+    --port          HTTP port for your cluster
+    --index         Index to run commands against
+    --base          For daily indexes, reference only those starting with "logstash"
+                     (same as --pattern logstash-* or logstash-DATE)
+    --pattern       Use a pattern to operate on the indexes
 
 From CLI::Helpers:
 
