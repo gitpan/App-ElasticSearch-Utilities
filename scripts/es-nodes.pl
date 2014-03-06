@@ -70,7 +70,7 @@ es-nodes.pl - Listing the nodes in a cluster with some details
 
 =head1 VERSION
 
-version 2.3
+version 2.4
 
 =head1 SYNOPSIS
 
@@ -81,16 +81,6 @@ Options:
     --help              print help
     --manual            print full manual
     --attibutes         Comma separated list of attributes to display, default is NONE
-
-From App::ElasticSearch::Utilities:
-
-    --local         Use localhost as the elasticsearch host
-    --host          ElasticSearch host to connect to
-    --port          HTTP port for your cluster
-    --index         Index to run commands against
-    --base          For daily indexes, reference only those starting with "logstash"
-                     (same as --pattern logstash-* or logstash-DATE)
-    --pattern       Use a pattern to operate on the indexes
 
 From CLI::Helpers:
 

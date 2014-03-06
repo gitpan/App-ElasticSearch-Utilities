@@ -1,12 +1,11 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '2.3'; # VERSION
+our $VERSION = '2.4'; # VERSION
 
 use strict;
 use warnings;
 
-our $ES_CLASS = undef;
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
 our @_CONFIGS = (
@@ -541,7 +540,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 2.3
+version 2.4
 
 =head1 SYNOPSIS
 
@@ -744,6 +743,8 @@ Some options may be specified in the B</etc/es-utils.yaml> or B<$HOME/.es-utils.
     timeout: 10
 
 =head1 INSTALL
+
+B<CURRENTLY ONLY SUPPORTING 0.90.x VERSIONS OF ELASTICSEARCH>
 
 Recommended install with L<CPAN Minus|http://cpanmin.us>:
 
