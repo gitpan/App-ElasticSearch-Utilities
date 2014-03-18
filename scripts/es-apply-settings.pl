@@ -95,15 +95,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 es-apply-settings.pl - Run to apply a JSON list of settings to indexes matching a pattern
 
 =head1 VERSION
 
-version 2.4
+version 2.5
 
 =head1 SYNOPSIS
 

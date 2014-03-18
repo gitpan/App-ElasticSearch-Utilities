@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: es-search.pl
 # ABSTRACT: Provides a CLI for quick searches of data in ElasticSearch daily indexes
+$|=1;           # Flush STDOUT
 use strict;
 use warnings;
 
@@ -326,15 +327,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily indexes
 
 =head1 VERSION
 
-version 2.4
+version 2.5
 
 =head1 SYNOPSIS
 

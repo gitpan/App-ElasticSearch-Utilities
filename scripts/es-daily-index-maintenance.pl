@@ -19,6 +19,7 @@ GetOptions(\%opt,
     'delete-days:i',
     'replicas',
     'replicas-min:i',
+    'replicas-max:i',
     'replicas-age:s',
     'optimize',
     'optimize-days:i',
@@ -39,6 +40,7 @@ my %CFG = (
     'optimize-days'  => 1,
     'delete-days'    => 90,
     'replicas-min'   => 0,
+    'replicas-max'   => 100,
     'dry-run'        => 0,
     'replicas-age'   => 60,
     timezone         => 'Europe/Amsterdam',
@@ -89,6 +91,11 @@ foreach my $index (sort @indices) {
 
     my $days_old = es_index_days_old( $index );
 
+    if( $days_old < 1 ) {
+        verbose("$index for today, skipping.");
+        next;
+    }
+
     # Delete the Index if it's too old
     if( $CFG{delete} && $CFG{'delete-days'} < $days_old ) {
         output({color=>"red"}, "$index will be deleted.");
@@ -110,6 +117,8 @@ foreach my $index (sort @indices) {
                 $replicas--;
             }
         }
+        # If we set replicas max, honor it.
+        $replicas = $opt{'replicas-max'} if exists $opt{'replicas-max'} && $replicas > $opt{'replicas-max'};
         debug({indent=>1}, "+ replica aging (P:$shards{primaries} R:$shards{replicas}->$replicas): " . join(',', @ages));
         $replicas = $CFG{'replicas-min'} if $replicas < $CFG{'replicas-min'};
         if ( $shards{primaries} > 0 && $shards{replicas} != $replicas ) {
@@ -162,15 +171,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 es-daily-index-maintenance.pl - Run to prune old indexes and optimize existing
 
 =head1 VERSION
 
-version 2.4
+version 2.5
 
 =head1 SYNOPSIS
 

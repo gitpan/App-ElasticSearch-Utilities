@@ -321,15 +321,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 es-graphite-static.pl - Gather performance metrics from an ES node and send them to Graphite
 
 =head1 VERSION
 
-version 2.4
+version 2.5
 
 =head1 SYNOPSIS
 
