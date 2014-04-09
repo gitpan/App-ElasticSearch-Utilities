@@ -321,13 +321,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 es-graphite-static.pl - Gather performance metrics from an ES node and send them to Graphite
 
 =head1 VERSION
 
-version 2.5
+version 2.6
 
 =head1 SYNOPSIS
 
@@ -343,6 +345,30 @@ Options:
     --carbon-port       Port for to use for Carbon (Default: 2003)
     --carbon-proto      Protocol for to use for Carbon (Default: tcp)
     --with-indices      Also send individual index stats
+
+From App::ElasticSearch::Utilities:
+
+    --local         Use localhost as the elasticsearch host
+    --host          ElasticSearch host to connect to
+    --port          HTTP port for your cluster
+    --noop          Any operations other than GET are disabled
+    --timeout       Timeout to ElasticSearch, default 30
+    --keep-proxy    Do not remove any proxy settings from %ENV
+    --index         Index to run commands against
+    --base          For daily indexes, reference only those starting with "logstash"
+                     (same as --pattern logstash-* or logstash-DATE)
+    --datesep       Date separator, default '.' also (--date-separator)
+    --pattern       Use a pattern to operate on the indexes
+    --days          If using a pattern or base, how many days back to go, default: all
+
+=head2 ARGUMENT GLOBALS
+
+Some options may be specified in the B</etc/es-utils.yaml> or B<$HOME/.es-utils.yaml> file:
+
+    ---
+    host: esproxy.example.com
+    port: 80
+    timeout: 10
 
 From CLI::Helpers:
 
