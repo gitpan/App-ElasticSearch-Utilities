@@ -192,7 +192,7 @@ es-graphite-dynamic.pl - Dynamically gather metrics and send to graphite
 
 =head1 VERSION
 
-version 2.6
+version 2.7
 
 =head1 SYNOPSIS
 

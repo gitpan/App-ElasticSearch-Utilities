@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '2.6'; # VERSION
+our $VERSION = '2.7'; # VERSION
 
 use strict;
 use warnings;
@@ -111,6 +111,7 @@ my %DEF = (
                    '.',
 );
 debug_var(\%DEF);
+CLI::Helpers::override(verbose => 1) if $DEF{NOOP};
 
 if( $DEF{NOPROXY} ) {
     debug("Removing any active HTTP Proxies from ENV.");
@@ -566,7 +567,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 2.6
+version 2.7
 
 =head1 SYNOPSIS
 
@@ -770,7 +771,7 @@ Some options may be specified in the B</etc/es-utils.yaml> or B<$HOME/.es-utils.
 
 =head1 INSTALL
 
-B<CURRENTLY ONLY SUPPORTING 0.90.x VERSIONS OF ELASTICSEARCH>
+B<This library attempts to provide scripts compatible with version 0.19 through 1.1 of ElasticSearch>.
 
 Recommended install with L<CPAN Minus|http://cpanmin.us>:
 

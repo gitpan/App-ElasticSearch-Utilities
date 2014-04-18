@@ -14,9 +14,11 @@ use App::ElasticSearch::Utilities qw(:all);
 my %opt;
 GetOptions(\%opt,
     'all',
-    'dry-run',
     'delete',
     'delete-days:i',
+    'close',
+    'close-days:i',
+    'replicas',
     'replicas',
     'replicas-min:i',
     'replicas-max:i',
@@ -39,12 +41,13 @@ pod2usage(-exitval => 0, -verbose => 2) if $opt{manual};
 my %CFG = (
     'optimize-days'  => 1,
     'delete-days'    => 90,
+    'close-days'     => 60,
     'replicas-min'   => 0,
     'replicas-max'   => 100,
-    'dry-run'        => 0,
     'replicas-age'   => 60,
     timezone         => 'Europe/Amsterdam',
     delete           => 0,
+    close            => 0,
     optimize         => 0,
     replicas         => 0,
 );
@@ -52,11 +55,9 @@ my %CFG = (
 foreach my $setting (keys %CFG) {
     $CFG{$setting} = $opt{$setting} if exists $opt{$setting} and defined $opt{$setting};
 }
-# Turn on verbose if debug is enabled
-override(verbose => 1) if $CFG{'dry-run'};
 
 # Figure out what to run
-my @MODES = qw(delete optimize replicas);
+my @MODES = qw(close delete optimize replicas);
 if ( exists $opt{all} && $opt{all} ) {
     map {
         $CFG{$_} = 1 unless $_ eq 'replicas';
@@ -68,7 +69,7 @@ else {
         $operate++ if $CFG{$mode};
         last if $operate;
     }
-    pod2usage(-message => "No operation selected, use --delete, --optimize, or --replicas.", -exitval => 1) unless $operate;
+    pod2usage(-message => "No operation selected, use --close, --delete, --optimize, or --replicas.", -exitval => 1) unless $operate;
 }
 # Can't have replicas-min below 0
 $CFG{'replicas-min'} = 0 if $CFG{'replicas-min'} < 0;
@@ -90,6 +91,7 @@ foreach my $index (sort @indices) {
     verbose({level=>2},"$index being evaluated");
 
     my $days_old = es_index_days_old( $index );
+    debug({color=>"cyan"}, "$index: index is $days_old days old");
 
     if( $days_old < 1 ) {
         verbose("$index for today, skipping.");
@@ -106,7 +108,6 @@ foreach my $index (sort @indices) {
     # Manage replicas
     if( $CFG{replicas} ) {
         my %shards = es_index_shards($index);
-        debug({color=>"cyan"}, "$index: index is $days_old days old");
         # Default for replicas is primaries - 1;
         my $replicas = $shards{primaries} - 1;
         my $iter = int(($AGE/$replicas) + 0.5);
@@ -165,6 +166,29 @@ foreach my $index (sort @indices) {
             }
         }
     }
+
+    # Close the index?
+    if( $CFG{close} && $CFG{'close-days'} < $days_old ) {
+        my $status = es_request('_status',{index=>$index});
+        if( defined $status ) {
+            if( $status->{_shards}{total} > 0 ) {
+                verbose({indent=>1}," - closing index.");
+                my $result = es_request('_close' => {method=>'POST',index=>$index});
+                if( defined $result && $result->{acknowledged}) {
+                    output({color=>'magenta'},"+ Closed $index.");
+                }
+                else {
+                    output({color=>'red'},"! Attempted to close $index, but did not succeed.");
+                }
+            }
+            else {
+                debug({indent=>1},"- $index already closed.");
+            }
+        }
+        else {
+            output({color=>'red'},"! Error establishing status of $index");
+        }
+    }
 }
 
 __END__
@@ -179,7 +203,7 @@ es-daily-index-maintenance.pl - Run to prune old indexes and optimize existing
 
 =head1 VERSION
 
-version 2.6
+version 2.7
 
 =head1 SYNOPSIS
 
@@ -189,7 +213,9 @@ Options:
 
     --help              print help
     --manual            print full manual
-    --all               Run delete, optimize, and replicas tools
+    --all               Run close, delete, optimize, and replicas tools
+    --close             Run close for indexes older than
+    --close-days        Age of the oldest index to keep open (default:60)
     --delete            Run delete indexes older than
     --delete-days       Age of oldest index to keep (default: 90)
     --optimize          Run optimize on indexes
@@ -243,13 +269,13 @@ Use with cron:
 
 =over 8
 
-=item B<optimize>
+=item B<close>
 
-Run the optimization hook
+Run the close hook
 
-=item B<optimize-days>
+=item B<close-days>
 
-Integer, optimize indexes older than this number of days
+Integer, close indexes older than this number of days
 
 =item B<delete>
 
@@ -258,6 +284,14 @@ Run the delete hook
 =item B<delete-days>
 
 Integer, delete indexes older than this number of days
+
+=item B<optimize>
+
+Run the optimization hook
+
+=item B<optimize-days>
+
+Integer, optimize indexes older than this number of days
 
 =item B<replicas>
 
