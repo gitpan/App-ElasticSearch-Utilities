@@ -56,19 +56,23 @@ my $ORDER = exists $OPT{asc} && $OPT{asc} ? 'asc' : 'desc';
 $ORDER = 'asc' if exists $OPT{tail};
 my %by_age = ();
 my %indices = map { $_ => es_index_days_old($_) } es_indices();
+my %FIELDS = ();
 foreach my $index (sort by_index_age keys %indices) {
     my $age = $indices{$index};
     $by_age{$age} ||= [];
     push @{ $by_age{$age} }, $index;
+    @FIELDS{es_index_fields($index)} = ();
 }
 debug_var(\%by_age);
 my @AGES = sort { $ORDER eq 'asc' ? $b <=> $a : $a <=> $b } keys %by_age;
+debug({color=>"cyan"}, "Fields discovered.");
+debug_var(\%FIELDS);
 
 # Which fields to show
 my @SHOW = ();
 my %HASH_FIELDS = ();
 if ( exists $OPT{show} && length $OPT{show} ) {
-    @SHOW = split /,/, $OPT{show};
+    @SHOW = grep { exists $FIELDS{$_} } split /,/, $OPT{show};
     # hash will contain '{fieldname.key1.key2.key3}' => { field => 'fieldname', key => [ 'key1', 'key2', 'key3' ] }
     %HASH_FIELDS = map { my @v = split( /\./, substr( $_, 1, -1 ) ); $_ => { field => shift( @v ), key => \@v  } } grep { /^\{.+\..+\}$/ } @SHOW;
     debug_var(\%HASH_FIELDS);
@@ -109,8 +113,8 @@ local $SIG{INT} = sub { $DONE=1 };
 
 my $facet_header = '';
 if( exists $OPT{top} ) {
-    my @facet_fields = grep { length($_) && es_facet_whitelist($_) } map { s/^\s+//; s/\s+$//; lc } split ',', $OPT{top};
-    croak("Option --top takes up to two whitelisted fields\n")
+    my @facet_fields = grep { length($_) && exists $FIELDS{$_} } map { s/^\s+//; s/\s+$//; lc } split ',', $OPT{top};
+    croak(sprintf("Option --top takes up to two fields, found %d fields: %s\n", scalar(@facet_fields),join(',',@facet_fields)))
         unless @facet_fields > 0 && @facet_fields < 3;
 
     my @facet;
@@ -119,16 +123,11 @@ if( exists $OPT{top} ) {
         $facet_header = "count\t" . $facet_fields[0];
     } else {
         #generate a script as
-        #$extra{facets} = { top => { terms => { fields => ['@fields.file', '@fields.src_ip'], size => $CONFIG{size} } } };  #this does not work as intended, d
         my $script_field = join " + ':' + ", map { "_doc['$_'].value" } @facet_fields;
         @facet = ( script_field => $script_field );
         $facet_header = "count\t" . join ':', @facet_fields;
     }
     $extra{facets} = { top => { terms => { size => $CONFIG{size}, @facet }, facet_filter => exists $extra{filter} ? $extra{filter} : {} } };
-    if( @AGES > 1 ) {
-        output({color=>'red',stderr=>1},"!! Faceting on multiple days disabled, only faceting for " . join(',', @{ $by_age{$AGES[0]} }));
-        @AGES = ($AGES[0]);
-    }
     $CONFIG{size} = 0;  # and we do not want any results other than the facet data
 }
 elsif(exists $OPT{tail}) {
@@ -147,7 +146,7 @@ my $header=0;
 my $age = undef;
 my %last_batch_id=();
 
-while( !$DONE || @AGES ) {
+AGES: while( !$DONE || @AGES ) {
     $age = @AGES ? shift @AGES : $age;
     select(undef,undef,undef,1) if exists $OPT{tail} && $last_hit_ts;
     my $start=time();
@@ -155,6 +154,7 @@ while( !$DONE || @AGES ) {
     my $local_search_string = exists $OPT{tail} ? sprintf('%s AND @timestamp:[%s TO *]', $search_string, $last_hit_ts)
                                                 : $search_string;
     debug({color=>'yellow'},"Search String is $local_search_string");
+    output({color=>'yellow'}, "Faceting for on " . join(',', @{ $by_age{$age} })) if $OPT{top};
     my $result = es_request('_search',
         # Search Parameters
         {
@@ -173,6 +173,7 @@ while( !$DONE || @AGES ) {
             %extra,
         }
     );
+    debug_var($result);
     $duration += time() - $start;
     next unless defined $result;
 
@@ -187,11 +188,13 @@ while( !$DONE || @AGES ) {
         # Handle Faceting
         my $facets = exists $result->{facets} ? $result->{facets}{top}{terms} : [];
         if( @$facets ) {
-            print "$facet_header\n";
-            for my $facet ( @$facets ) {
-                print "$facet->{count}\t$facet->{term}\n";
+            output({color=>'cyan'},$facet_header);
+            foreach my $facet ( @$facets ) {
+                output("$facet->{count}\t$facet->{term}");
+                $displayed++;
             }
-            last;
+            $TOTAL_HITS = $result->{facets}{top}{other} + $displayed;
+            next AGES;
         }
 
         # Reset the last batch ID if we have new data
@@ -272,43 +275,22 @@ sub extract_value {
     return $value;
 }
 
-sub extract_fields {
-    my $ref = shift;
-    my @keys = @_;
-
-    my @fields = ();
-    foreach my $key ( keys %{$ref} ) {
-        if( exists $ref->{$key}{properties} ) {
-            push @fields, extract_fields( $ref->{$key}{properties}, @keys, $key );
-        }
-        else {
-            my $field = join('.', @keys, $key);
-            if( $field =~ /^\@fields\.(.*)/ ) {
-                $field .= " alias is $1";
-            }
-            push @fields, $field;
-        }
-    }
-    return sort @fields;
-}
-
 sub show_fields {
-    my $index =  (sort by_index_age keys %indices)[0];
-    my $result = es_request('_mapping', { index => $index });
-    if(! defined $result) {
-        die "unable to read mapping for: $index\n";
+    output({color=>'cyan'}, 'Fields available for search:' );
+    my $total = 0;
+    foreach my $field (sort keys %FIELDS) {
+        $total++;
+        output(" - $field");
     }
-    debug_var($result);
-
-    my @mappings = grep { $_ ne '_default_' } keys %{ $result->{$index} };
-    my @keys = ();
-    foreach my $mapping (@mappings) {
-        next unless exists $result->{$index}{$mapping}{properties};
-        push @keys, extract_fields($result->{$index}{$mapping}{properties});
-    }
-
-    print map { "$_\n" } @keys;
+    output({color=>"yellow"},
+        sprintf("# Fields: %d from a combined %d indices.\n",
+            $total,
+            scalar(keys %indices),
+        )
+    );
 }
+
+
 sub by_index_age {
     return $ORDER eq 'asc'
         ? $indices{$b} <=> $indices{$a}
@@ -335,7 +317,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 2.7
+version 2.8
 
 =head1 SYNOPSIS
 

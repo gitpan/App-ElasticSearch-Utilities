@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '2.7'; # VERSION
+our $VERSION = '2.8'; # VERSION
 
 use strict;
 use warnings;
@@ -34,6 +34,7 @@ use Sub::Exporter -setup => {
         es_index_shards
         es_index_segments
         es_index_stats
+        es_index_fields
         es_settings
         es_node_stats
         es_segment_stats
@@ -42,7 +43,6 @@ use Sub::Exporter -setup => {
         es_delete_index
         es_optimize_index
         es_apply_index_settings
-        es_facet_whitelist
     )],
     groups => {
         default => [qw(es_connect es_indices es_request)],
@@ -421,6 +421,36 @@ sub es_index_valid {
 }
 
 
+sub es_index_fields {
+    my ($index) = @_;
+
+    my $result = es_request('_mapping', { index => $index });
+
+    # Handle Version incompatibilities
+    my $ref = exists $result->{$index}{mappings} ? $result->{$index}{mappings} : $result->{$index};
+
+    my %fields = ();
+
+    # Loop through the mappings, skipping _default_
+    my @mappings = grep { $_ ne '_default_' } keys %{ $ref };
+    foreach my $mapping (@mappings) {
+        next unless exists $ref->{$mapping}{properties};
+        @fields{_extract_fields($ref->{$mapping}{properties})} = ();
+    }
+
+    return wantarray ? keys %fields : [ keys %fields ];
+}
+
+sub _extract_fields {
+    my $ref = shift;
+    my @fields = ();
+    foreach my $key ( keys %{$ref} ) {
+        push @fields, exists $ref->{$key}{properties} ? _extract_fields( $ref->{$key}{properties}, $key ) : $key;
+    }
+    return @fields;
+}
+
+
 sub es_close_index {
     my($index) = @_;
 
@@ -527,23 +557,6 @@ sub es_node_stats {
 }
 
 
-my %_facet_whitelist = ();
-sub es_facet_whitelist {
-    my ($field) = @_;
-    if( !keys %_facet_whitelist ) {
-        if( exists $_GLOBALS{facet_whitelist} && ref $_GLOBALS{facet_whitelist} eq 'ARRAY') {
-            %_facet_whitelist = map { $_ => 1 } @{ $_GLOBALS{facet_whitelist} };
-        }
-        else {
-            %_facet_whitelist = ( __ANY__ => 1 );
-        }
-    }
-    return 1 if exists $_facet_whitelist{__ANY__};
-    return exists $_facet_whitelist{$field};
-}
-
-
-
 sub def {
     my($key)= map { uc }@_;
 
@@ -567,7 +580,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 2.7
+version 2.8
 
 =head1 SYNOPSIS
 
@@ -665,6 +678,10 @@ Returns the number of replicas for a given index.
 
 Checks if the specified index is valid
 
+=head2 es_index_fields('index-name')
+
+Returns a list of the fields in a given index.
+
 =head2 es_close_index('index-name')
 
 Closes an index
@@ -708,36 +725,6 @@ Returns a hashref
 Exposes GET /_nodes/stats
 
 Returns a hashref
-
-=head2 es_facet_whitelist('field name')
-
-Returns if the field is whitelisted
-
-Facet whitelists must be set in a configuration file.  Currently, the
-search path for config files is
-
-    /etc/es-utils.yaml
-    /etc/es-utils.yml
-    $ENV{HOME}/.es-utils.yaml
-    $ENV{HOME}/.es-utils.yml
-
-This does mean that users can override the whitelist, but this is by design.  If one of those
-files does not specify a facet_whitelist element as an array, the whitelist is not restricted.
-
-Examples:
-
----
-facet_whitelist:
-  - src_ip
-  - src_ip_country
-  - dst_ip
-  - dst_ip_country
-  - file
-  - filetype
-  - program
-  - status
-  - method
-  - protocol
 
 =head2 def('key')
 
