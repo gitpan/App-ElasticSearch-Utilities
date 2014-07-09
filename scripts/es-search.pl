@@ -32,6 +32,7 @@ GetOptions(\%OPT,
     'top:s',
     'tail',
     'fields',
+    'no-header',
     'help|h',
     'manual|m',
 );
@@ -43,6 +44,8 @@ my $search_string = join(' ', expand_ip_to_range(@ARGV));
 # Documentation
 pod2usage(1) if $OPT{help};
 pod2usage(-exitval => 0, -verbose => 2) if $OPT{manual};
+my $unknown_options = join ', ', grep /^--/, @ARGV;
+pod2usage({-exitval => 1, -msg =>"Unknown option(s): $unknown_options"}) if $unknown_options;
 
 #--------------------------------------------------------------------------#
 # App Config
@@ -142,7 +145,7 @@ my $TOTAL_HITS = 0;
 my $last_hit_ts = undef;
 my $duration = 0;
 my $displayed = 0;
-my $header=0;
+my $header = exists $OPT{'no-header'};
 my $age = undef;
 my %last_batch_id=();
 
@@ -309,15 +312,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily indexes
 
 =head1 VERSION
 
-version 2.8
+version 2.9
 
 =head1 SYNOPSIS
 
@@ -335,31 +336,8 @@ Options:
     --size              Result size, default is 20
     --asc               Sort by ascending timestamp
     --desc              Sort by descending timestamp (Default)
+    --no-header         Do not show the header with field names in the query results
     --fields            Display the field list for this index!
-
-From App::ElasticSearch::Utilities:
-
-    --local         Use localhost as the elasticsearch host
-    --host          ElasticSearch host to connect to
-    --port          HTTP port for your cluster
-    --noop          Any operations other than GET are disabled
-    --timeout       Timeout to ElasticSearch, default 30
-    --keep-proxy    Do not remove any proxy settings from %ENV
-    --index         Index to run commands against
-    --base          For daily indexes, reference only those starting with "logstash"
-                     (same as --pattern logstash-* or logstash-DATE)
-    --datesep       Date separator, default '.' also (--date-separator)
-    --pattern       Use a pattern to operate on the indexes
-    --days          If using a pattern or base, how many days back to go, default: all
-
-=head2 ARGUMENT GLOBALS
-
-Some options may be specified in the B</etc/es-utils.yaml> or B<$HOME/.es-utils.yaml> file:
-
-    ---
-    host: esproxy.example.com
-    port: 80
-    timeout: 10
 
 From CLI::Helpers:
 

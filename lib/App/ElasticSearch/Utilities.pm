@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '2.8'; # VERSION
+our $VERSION = '2.9'; # VERSION
 
 use strict;
 use warnings;
@@ -316,6 +316,9 @@ sub es_indices {
         check_dates => 1,
         @_
     );
+    # Seriously, English? Do you speak it motherfucker?
+    $args{state} = 'close' if $args{state} eq 'closed';
+
     my @indices = ();
 
     # Simplest case, single index
@@ -328,7 +331,13 @@ sub es_indices {
             debug("Evaluating '$index'");
             if(!exists $args{_all}) {
                 # State Check Disqualification
-                next if $args{check_state} && $args{state} ne $meta{$index}->{state} && $args{state} ne 'all';
+                if($args{state} ne 'all'  && $args{check_state})  {
+                    my $result = $meta{$index}->{state} eq $args{state};
+                    debug({indent=>1,color=>$result ? 'green' : 'red' },
+                        sprintf('+ method:state=%s, got %s', $args{state}, $meta{$index}->{state})
+                    );
+                    next unless $result;
+                }
 
                 if( defined $DEF{BASE} ) {
                     debug({indent=>1}, "+ method:base - $DEF{BASE}");
@@ -341,6 +350,7 @@ sub es_indices {
                     debug({indent=>1}, "+ method:pattern - $p->{string}");
                     next unless $index =~ /^$p->{re}/;
                 }
+                debug({indent=>2},"= name checks succeeded");
                 if( $args{check_dates} && defined $DEF{DAYS} ) {
                     debug({indent=>2,color=>"yellow"}, "+ checking to see if index is in the past $DEF{DAYS} days.");
 
@@ -572,15 +582,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 2.8
+version 2.9
 
 =head1 SYNOPSIS
 
@@ -606,6 +614,7 @@ B<MAINTENANCE>:
 
     scripts/es-daily-index-maintenance.pl - Perform index maintenance on daily indexes
     scripts/es-alias-manager.pl - Manage index aliases automatically
+    scripts/es-open.pl - Open any closed indices matching a index parameters
 
 B<MANAGEMENT>:
 
@@ -665,6 +674,25 @@ line.  Can handle indices named:
     logstash-YYYY.MM.DD-dcid
 
 Makes use of --datesep to determine where the date is.
+
+Options include:
+
+=over 4
+
+=item B<state>
+
+Default is 'open', can be used to find 'closed' indexes as well.
+
+=item B<check_state>
+
+Default is 1, set to 0 to disable state checks.  The combination of the default
+with this option and the default for B<state> means only open indices are returned.
+
+=item B<check_dates>
+
+Default is 1, set to 0 to disable checking index age.
+
+=back
 
 =head2 es_index_days_old( 'index-name' )
 

@@ -214,15 +214,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 es-status.pl - Simple ElaticSearch Status Checks
 
 =head1 VERSION
 
-version 2.8
+version 2.9
 
 =head1 SYNOPSIS
 
@@ -239,15 +237,6 @@ Query Modes:
     --settings          Display index settings (--verbose shows more detail)
 
     --all               Run all handlers!
-
-=head2 ARGUMENT GLOBALS
-
-Some options may be specified in the B</etc/es-utils.yaml> or B<$HOME/.es-utils.yaml> file:
-
-    ---
-    host: esproxy.example.com
-    port: 80
-    timeout: 10
 
 From CLI::Helpers:
 

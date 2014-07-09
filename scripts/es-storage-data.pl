@@ -180,15 +180,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 es-storage-data.pl - Index pattern-aware elasticsearch storage statistics
 
 =head1 VERSION
 
-version 2.8
+version 2.9
 
 =head1 SYNOPSIS
 
@@ -204,30 +202,6 @@ Options:
     --limit             Show only the top N, default no limit
     --asc               Sort ascending
     --desc              Sort descending (default)
-
-From App::ElasticSearch::Utilities:
-
-    --local         Use localhost as the elasticsearch host
-    --host          ElasticSearch host to connect to
-    --port          HTTP port for your cluster
-    --noop          Any operations other than GET are disabled
-    --timeout       Timeout to ElasticSearch, default 30
-    --keep-proxy    Do not remove any proxy settings from %ENV
-    --index         Index to run commands against
-    --base          For daily indexes, reference only those starting with "logstash"
-                     (same as --pattern logstash-* or logstash-DATE)
-    --datesep       Date separator, default '.' also (--date-separator)
-    --pattern       Use a pattern to operate on the indexes
-    --days          If using a pattern or base, how many days back to go, default: all
-
-=head2 ARGUMENT GLOBALS
-
-Some options may be specified in the B</etc/es-utils.yaml> or B<$HOME/.es-utils.yaml> file:
-
-    ---
-    host: esproxy.example.com
-    port: 80
-    timeout: 10
 
 From CLI::Helpers:
 
