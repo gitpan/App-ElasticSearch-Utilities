@@ -42,7 +42,7 @@
             "Time::Local" : "0",
             "YAML" : "0",
             "feature" : "0",
-            "perl" : "5.010",
+            "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -70,7 +70,7 @@
          "web" : "https://github.com/reyjrar/es-utils"
       }
    },
-   "version" : "2.9",
+   "version" : "3.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.016002"
