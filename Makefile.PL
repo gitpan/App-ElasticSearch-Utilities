@@ -57,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "3.0",
+  "VERSION" => "3.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

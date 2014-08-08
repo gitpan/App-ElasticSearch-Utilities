@@ -214,7 +214,7 @@ es-daily-index-maintenance.pl - Run to prune old indexes and optimize existing
 
 =head1 VERSION
 
-version 3.0
+version 3.1
 
 =head1 SYNOPSIS
 
