@@ -211,13 +211,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 es-nagios-check.pl - ElasticSearch Nagios Checks
 
 =head1 VERSION
 
-version 3.1
+version 3.2
 
 =head1 SYNOPSIS
 

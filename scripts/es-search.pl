@@ -9,6 +9,7 @@ use App::ElasticSearch::Utilities qw(:all);
 use Data::Dumper;
 use Carp;
 use CLI::Helpers qw(:all);
+use File::Slurp qw(slurp);
 use Getopt::Long qw(:config no_ignore_case no_ignore_case_always);
 use Pod::Usage;
 use POSIX qw(strftime);
@@ -30,16 +31,18 @@ GetOptions(\%OPT,
     'size|n:i',
     'show:s',
     'top:s',
+    'by:s',
     'tail',
     'fields',
     'bases',
+    'all',
     'no-header',
     'help|h',
     'manual|m',
 );
 
 # Search string is the rest of the argument string
-my $search_string = join(' ', expand_ip_to_range(@ARGV));
+my $search_string = join(' ', format_search_string(@ARGV));
 
 #------------------------------------------------------------------------#
 # Documentation
@@ -93,11 +96,6 @@ pod2usage({-exitval => 1, -msg => 'No search string specified'}) unless defined 
 pod2usage({-exitval => 1, -msg => 'Cannot use --tail and --top together'}) if exists $OPT{tail} && $OPT{top};
 pod2usage({-exitval => 1, -msg => 'Please specify --show with --tail'}) if exists $OPT{tail} && !@SHOW;
 
-# Fix common mistakes
-$search_string =~ s/\s+and\s+/ AND /g;
-$search_string =~ s/\s+or\s+/ OR /g;
-$search_string =~ s/\s+not\s+/ NOT /g;
-
 # Process extra parameters
 my %extra = ();
 my @filters = ();
@@ -118,23 +116,59 @@ if( @filters ) {
 my $DONE = 1;
 local $SIG{INT} = sub { $DONE=1 };
 
+my $top_type = exists $OPT{by} ? "aggregations" : "facets";
+my %TOPKEYS = (
+    aggregations => {
+        base  => "buckets",
+        key   => "key",
+        count => "doc_count",
+    },
+    facets => {
+        base  => "terms",
+        key   => "term",
+        count => "count",
+    },
+);
+my %SUPPORTED_AGGREGATIONS = map {$_=>1} qw(cardinality);
+my $SUBAGG = undef;
 my $facet_header = '';
 if( exists $OPT{top} ) {
     my @facet_fields = grep { length($_) && exists $FIELDS{$_} } map { s/^\s+//; s/\s+$//; lc } split ',', $OPT{top};
-    croak(sprintf("Option --top takes up to two fields, found %d fields: %s\n", scalar(@facet_fields),join(',',@facet_fields)))
-        unless @facet_fields > 0 && @facet_fields < 3;
+    croak(sprintf("Option --top takes a field, found %d fields: %s\n", scalar(@facet_fields),join(',',@facet_fields)))
+        unless @facet_fields == 1;
 
-    my @facet;
-    if ( scalar @facet_fields == 1 ) {
-        @facet = ( field => $facet_fields[0] );
-        $facet_header = "count\t" . $facet_fields[0];
-    } else {
-        #generate a script as
-        my $script_field = join " + ':' + ", map { "_doc['$_'].value" } @facet_fields;
-        @facet = ( script_field => $script_field );
-        $facet_header = "count\t" . join ':', @facet_fields;
+    my %sub_agg = ();
+    if(exists $OPT{by}) {
+        my ($type,$field) = split /\:/, $OPT{by};
+        if( exists $SUPPORTED_AGGREGATIONS{$type} ) {
+            $SUBAGG = $type;
+            $sub_agg{by} = { $type => {field => $field} };
+        }
+        else {
+            output({color=>'red'}, "Aggregation '$type' is not currently supported, ignoring.");
+        }
     }
-    $extra{facets} = { top => { terms => { size => $CONFIG{size}, @facet }, facet_filter => exists $extra{filter} ? $extra{filter} : {} } };
+
+    my $facet = shift @facet_fields;
+    $facet_header = "count\t" . $facet;
+    $extra{$top_type} = { top => { terms => { field => $facet } } };
+
+    if( $top_type eq 'facets' && exists $extra{filter} ) {
+        $extra{$top_type}->{top}{facet_filter} = $extra{filter};
+    }
+    elsif( $top_type eq 'aggregations' && keys %sub_agg ) {
+        $facet_header = "$OPT{by}\t" . $facet_header;
+        $extra{$top_type}->{top}{terms}{order} = { by => $ORDER };
+        $extra{$top_type}->{top}{aggregations} = \%sub_agg;
+    }
+
+    if( exists $OPT{all} ) {
+        verbose({color=>'cyan'}, "Facets with --all are limited to returning 1,000,000 results.");
+        $extra{$top_type}->{top}{terms}{size} = 1_000_000;
+    }
+    else {
+        $extra{$top_type}->{top}{terms}{size} = $CONFIG{size};
+    }
     $CONFIG{size} = 0;  # and we do not want any results other than the facet data
 }
 elsif(exists $OPT{tail}) {
@@ -169,7 +203,7 @@ AGES: while( !$DONE || @AGES ) {
             index     => $by_age{$age},
             uri_param => {
                 timeout     => '10s',
-                scroll      => $OPT{top} ? 0 :'30s',
+                exists $OPT{top} ? () : (scroll => '30s'),
             },
             method => 'POST',
         },
@@ -184,9 +218,16 @@ AGES: while( !$DONE || @AGES ) {
     debug_var($result);
     $duration += time() - $start;
     next unless defined $result;
-
+    if ( $result->{error} ) {
+        my ($simple_error) = $result->{error} =~ m/(QueryParsingException\[\[[^\]]+\][^\]]+\]\]);/;
+        $simple_error ||= '';
+        output({stderr=>1,color=>'red'},
+            "# Received an error from the cluster. $simple_error"
+        );
+        next;
+    }
     $displayed_indices{$_} = 1 for @{ $by_age{$age} };
-    $TOTAL_HITS += $result->{hits}{total};
+    $TOTAL_HITS += $result->{hits}{total} if $result->{hits}{total};
 
     my @always = qw(@timestamp);
     $header++ == 0 && @SHOW && output({color=>'cyan'}, join("\t", @always,@SHOW));
@@ -194,19 +235,28 @@ AGES: while( !$DONE || @AGES ) {
         my $hits = ref $result->{hits}{hits} eq 'ARRAY' ? $result->{hits}{hits} : [];
 
         # Handle Faceting
-        my $facets = exists $result->{facets} ? $result->{facets}{top}{terms} : [];
+        my $facets = exists $result->{$top_type} ? $result->{$top_type}{top}{$TOPKEYS{$top_type}->{base}} : [];
         if( @$facets ) {
             output({color=>'cyan'},$facet_header);
             foreach my $facet ( @$facets ) {
-                $FACET_TOTALS{$facet->{term}} ||= 0;
-                $FACET_TOTALS{$facet->{term}} += $facet->{count};
-                output("$facet->{count}\t$facet->{term}");
+                $FACET_TOTALS{$facet->{$TOPKEYS{$top_type}->{key}}} ||= 0;
+                $FACET_TOTALS{$facet->{$TOPKEYS{$top_type}->{key}}} += $facet->{$TOPKEYS{$top_type}->{count}};
+                my @out = (
+                    $facet->{$TOPKEYS{$top_type}->{count}},
+                    $facet->{$TOPKEYS{$top_type}->{key}},
+                );
+                if(exists $facet->{by} ) {
+                    if( $SUBAGG eq 'cardinality' ) {
+                        unshift @out, $facet->{by}{value};
+                    }
+                }
+                output(join("\t",@out));
                 $displayed++;
             }
-            $TOTAL_HITS = $result->{facets}{top}{other} + $displayed;
+            $TOTAL_HITS = exists $result->{$top_type}{top}{other} ? $result->{$top_type}{top}{other} + $displayed : $TOTAL_HITS;
             next AGES;
         }
-        elsif(exists $result->{facets}{top}) {
+        elsif(exists $result->{$top_type}{top}) {
             output({indent=>1,color=>'red'}, "= No results.");
             next AGES;
         }
@@ -253,11 +303,11 @@ AGES: while( !$DONE || @AGES ) {
                 $output = Dump $record;
             }
 
-            output($output);
+            output({data=>1}, $output);
             $displayed++;
-            last if $DONE && $displayed >= $CONFIG{size};
+            last if !exists $OPT{all} && $DONE && $displayed >= $CONFIG{size};
         }
-        last if $DONE && $displayed >= $CONFIG{size};
+        last if !exists $OPT{all} && $DONE && $displayed >= $CONFIG{size};
 
         # Scroll forward
         $start = time;
@@ -270,7 +320,7 @@ AGES: while( !$DONE || @AGES ) {
         $duration += time - $start;
         last unless @{ $result->{hits}{hits} } > 0;
     }
-    last if $DONE && $displayed >= $CONFIG{size};
+    last if !exists $OPT{all} && $DONE && $displayed >= $CONFIG{size};
 }
 
 output({stderr=>1,color=>'yellow'},
@@ -287,7 +337,7 @@ if(keys %FACET_TOTALS) {
     output({color=>'yellow'}, '#', '# Totals across batch', '#');
     output({color=>'cyan'},$facet_header);
     foreach my $k (sort { $FACET_TOTALS{$b} <=> $FACET_TOTALS{$a} } keys %FACET_TOTALS) {
-        output({color=>'green'},"$FACET_TOTALS{$k}\t$k");
+        output({data=>1,color=>'green'},"$FACET_TOTALS{$k}\t$k");
     }
 }
 
@@ -339,17 +389,43 @@ sub by_index_age {
         : $indices{$a} <=> $indices{$b};
 }
 
-sub expand_ip_to_range {
-    for ( @_ ) {
-        s/^([^:]+_ip):(\d+\.\d+)\.\*(?:\.\*)?$/$1:[$2.0.0 $2.255.255]/;
-        s/^([^:]+_ip):(\d+\.\d+\.\d+)\.\*$/$1:[$2.0 $2.255]/;
+my %BareWords;
+sub format_search_string {
+    my @modified = ();
+    %BareWords = map { $_ => uc } qw(and not or);
+    foreach my $part ( @_ ) {
+        if( my ($term,$match) = split /\:/, $part, 2 ) {
+            if( defined $match && $match =~ /(.*\.dat)(?:\[(-?\d+)\])?$/) {
+                my($file,$offset) = ($1,$2);
+                if( -f $file ) {
+                    my @data = grep { defined && length } slurp($file);
+                    $offset //= -1; # Default to the last column
+                    if( @data ) {
+                        my %data;
+                        for(@data) {
+                            my @cols = split /\s+/;
+                            $data{$cols[$offset]} = 1 if defined $cols[$offset];
+                        }
+                        push @modified,"$term:(" . join(' OR ', sort keys %data) . ")";
+                        next;
+                    }
+                }
+            }
+            else {
+                $part =~ s/^([^:]+_ip):(\d+\.\d+)\.\*(?:\.\*)?$/$1:[$2.0.0 $2.255.255]/;
+                $part =~ s/^([^:]+_ip):(\d+\.\d+\.\d+)\.\*$/$1:[$2.0 $2.255]/;
+            }
+        }
+        push @modified, exists $BareWords{lc $part} ? $BareWords{lc $part} : $part;
     }
-    @_;
+    @modified;
 }
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -357,7 +433,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 3.1
+version 3.2
 
 =head1 SYNOPSIS
 
@@ -370,17 +446,44 @@ Options:
     --show              Comma separated list of fields to display, default is ALL, switches to tab output
     --tail              Continue the query until CTRL+C is sent
     --top               Perform a facet on the fields, by a comma separated list of up to 2 items
+    --by                Perform an aggregation using the result of this, example: --by cardinality:@fields.src_ip
     --exists            Field which must be present in the document
     --missing           Field which must not be present in the document
     --size              Result size, default is 20
+    --all               Don't consider result size, just give me *everything*
     --asc               Sort by ascending timestamp
     --desc              Sort by descending timestamp (Default)
     --no-header         Do not show the header with field names in the query results
     --fields            Display the field list for this index!
     --bases             Display the index base list for this cluster.
 
+From App::ElasticSearch::Utilities:
+
+    --local         Use localhost as the elasticsearch host
+    --host          ElasticSearch host to connect to
+    --port          HTTP port for your cluster
+    --noop          Any operations other than GET are disabled
+    --timeout       Timeout to ElasticSearch, default 30
+    --keep-proxy    Do not remove any proxy settings from %ENV
+    --index         Index to run commands against
+    --base          For daily indexes, reference only those starting with "logstash"
+                     (same as --pattern logstash-* or logstash-DATE)
+    --datesep       Date separator, default '.' also (--date-separator)
+    --pattern       Use a pattern to operate on the indexes
+    --days          If using a pattern or base, how many days back to go, default: all
+
+=head2 ARGUMENT GLOBALS
+
+Some options may be specified in the B</etc/es-utils.yaml> or B<$HOME/.es-utils.yaml> file:
+
+    ---
+    host: esproxy.example.com
+    port: 80
+    timeout: 10
+
 From CLI::Helpers:
 
+    --data-file         Path to a file to write lines tagged with 'data => 1'
     --color             Boolean, enable/disable color, default use git settings
     --verbose           Incremental, increase verbosity
     --debug             Show developer output
@@ -411,6 +514,45 @@ Examples might include:
 
     # Tail the access log for www.example.com 404's
     es-search.pl --base access --tail --show src_ip,file,referer_domain dst:www.example.com AND crit:404
+
+=head2 Extended Syntax
+
+The search string is pre-analyzed before being sent to ElasticSearch.  Basic formatting is corrected:
+
+The following barewords are transformed:
+
+    or => OR
+    and => AND
+    not => NOT
+
+If a field is an IP address wild card, it is transformed:
+
+    src_ip:10.* => src_ip:[10.0.0.0 TO 10.255.255.255]
+
+If the match ends in '.dat', then we attempt to read a file with that name and OR the condition:
+
+    $ cat test.dat
+    50 1.2.3.4
+    40 1.2.3.5
+    30 1.2.3.6
+    20 1.2.3.7
+
+We can source that file:
+
+    src_ip:test.dat => src_ip:(1.2.3.4 OR 1.2.3.5 OR 1.2.3.6 OR 1.2.3.7)
+
+This make it simple to use the --data-file output options and build queries based off previous queries.
+
+You can also specify the column of the data file to use, the default being the last column or (-1).  Columns are
+B<zero-based> indexing. This means the first column is index 0, second is 1, ..  The previous example can be rewritten
+as:
+
+    src_ip:test.dat[1]
+
+or:
+    src_ip:test.dat[-1]
+
+=head2 Meta-Queries
 
 Helpful in building queries is the --bases and --fields options which lists the index bases and fields:
 
@@ -450,10 +592,28 @@ specify --show with this option.
 
 =item B<top>
 
-Comma separated list of fields to facet on.  Given that this uses scripted facets for multi-field facets,
-it is limited to faceting on up to 2 fields.  This option is not available when using --tail
+Perform an aggregation or facet returning the top field.  Limited to a single field at this time.
+This option is not available when using --tail.
 
     --top src_ip
+
+=item B<by>
+
+Perform a sub aggregation on the top terms aggregation and order by the result of this aggregation.
+Aggregation syntax is as follows:
+
+    --by <type>:<field>
+
+A full example might look like this:
+
+    $ es-search.pl --base access dst:www.example.com --top src_ip --by cardinality:@fields.acct
+
+This will show the top source IP's ordered by the cardinality (count of the distinct values) of accounts logging
+in as each source IP, instead of the source IP with the most records.
+
+Supported sub agggregations and formats:
+
+    cardinality:<field>
 
 =item B<exists>
 
@@ -495,6 +655,11 @@ is 'logstash' which will expand to 'logstash-YYYY.MM.DD'
 =item B<size>
 
 The number of results to show, default is 20.
+
+=item B<all>
+
+If specified, ignore the --size parameter and show me everything within the date range I specified.
+In the case of --top, this limits the result set to 1,000,000 results.
 
 =back
 

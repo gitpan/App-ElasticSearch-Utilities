@@ -1,7 +1,7 @@
 # ABSTRACT: Fix version issues to support all the things
 package App::ElasticSearch::Utilities::VersionHacks;
 
-our $VERSION = '3.1'; # VERSION
+our $VERSION = '3.2'; # VERSION
 use strict;
 use warnings;
 
@@ -152,13 +152,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 App::ElasticSearch::Utilities::VersionHacks - Fix version issues to support all the things
 
 =head1 VERSION
 
-version 3.1
+version 3.2
 
 =head1 AUTHOR
 

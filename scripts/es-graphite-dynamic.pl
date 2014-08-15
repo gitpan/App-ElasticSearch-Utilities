@@ -184,13 +184,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 es-graphite-dynamic.pl - Dynamically gather metrics and send to graphite
 
 =head1 VERSION
 
-version 3.1
+version 3.2
 
 =head1 SYNOPSIS
 
@@ -207,8 +209,33 @@ Options:
     --with-indices      Also send individual index stats
     --ignore            Comma separated list of keys to ignore in collection
 
+From App::ElasticSearch::Utilities:
+
+    --local         Use localhost as the elasticsearch host
+    --host          ElasticSearch host to connect to
+    --port          HTTP port for your cluster
+    --noop          Any operations other than GET are disabled
+    --timeout       Timeout to ElasticSearch, default 30
+    --keep-proxy    Do not remove any proxy settings from %ENV
+    --index         Index to run commands against
+    --base          For daily indexes, reference only those starting with "logstash"
+                     (same as --pattern logstash-* or logstash-DATE)
+    --datesep       Date separator, default '.' also (--date-separator)
+    --pattern       Use a pattern to operate on the indexes
+    --days          If using a pattern or base, how many days back to go, default: all
+
+=head2 ARGUMENT GLOBALS
+
+Some options may be specified in the B</etc/es-utils.yaml> or B<$HOME/.es-utils.yaml> file:
+
+    ---
+    host: esproxy.example.com
+    port: 80
+    timeout: 10
+
 From CLI::Helpers:
 
+    --data-file         Path to a file to write lines tagged with 'data => 1'
     --color             Boolean, enable/disable color, default use git settings
     --verbose           Incremental, increase verbosity
     --debug             Show developer output

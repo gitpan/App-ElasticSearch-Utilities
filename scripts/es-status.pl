@@ -214,13 +214,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 es-status.pl - Simple ElaticSearch Status Checks
 
 =head1 VERSION
 
-version 3.1
+version 3.2
 
 =head1 SYNOPSIS
 
@@ -238,8 +240,18 @@ Query Modes:
 
     --all               Run all handlers!
 
+=head2 ARGUMENT GLOBALS
+
+Some options may be specified in the B</etc/es-utils.yaml> or B<$HOME/.es-utils.yaml> file:
+
+    ---
+    host: esproxy.example.com
+    port: 80
+    timeout: 10
+
 From CLI::Helpers:
 
+    --data-file         Path to a file to write lines tagged with 'data => 1'
     --color             Boolean, enable/disable color, default use git settings
     --verbose           Incremental, increase verbosity
     --debug             Show developer output
