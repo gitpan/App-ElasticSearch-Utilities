@@ -222,7 +222,7 @@ es-status.pl - Simple ElaticSearch Status Checks
 
 =head1 VERSION
 
-version 3.2
+version 3.3
 
 =head1 SYNOPSIS
 

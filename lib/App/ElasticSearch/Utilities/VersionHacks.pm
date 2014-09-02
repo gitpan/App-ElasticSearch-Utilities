@@ -1,7 +1,7 @@
 # ABSTRACT: Fix version issues to support all the things
 package App::ElasticSearch::Utilities::VersionHacks;
 
-our $VERSION = '3.2'; # VERSION
+our $VERSION = '3.3'; # VERSION
 use strict;
 use warnings;
 
@@ -160,7 +160,7 @@ App::ElasticSearch::Utilities::VersionHacks - Fix version issues to support all 
 
 =head1 VERSION
 
-version 3.2
+version 3.3
 
 =head1 AUTHOR
 
