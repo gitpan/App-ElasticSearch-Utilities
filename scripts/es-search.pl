@@ -6,42 +6,39 @@ use strict;
 use warnings;
 
 use App::ElasticSearch::Utilities qw(:all);
-use Data::Dumper;
 use Carp;
 use CLI::Helpers qw(:all);
 use File::Slurp qw(slurp);
 use Getopt::Long qw(:config no_ignore_case no_ignore_case_always);
 use JSON;
+use Net::CIDR::Lite;
 use Pod::Usage;
 use POSIX qw(strftime);
 use YAML;
-
-# For Elements which are data structures
-local $Data::Dumper::Indent = 0;
-local $Data::Dumper::Terse = 1;
-local $Data::Dumper::Sortkeys = 1;
 
 #------------------------------------------------------------------------#
 # Argument Parsing
 my %OPT;
 GetOptions(\%OPT,
-    'asc',
-    'desc',
-    'match-all',
-    'exists:s',
-    'missing:s',
-    'prefix:s@',
-    'size|n:i',
-    'show:s',
-    'top:s',
-    'by:s',
-    'tail',
-    'fields',
-    'bases',
     'all',
-    'no-header',
+    'asc',
+    'bases',
+    'by:s',
+    'desc',
+    'exists:s',
+    'fields',
+    'format:s',
     'help|h',
     'manual|m',
+    'match-all',
+    'missing:s',
+    'no-header',
+    'prefix:s@',
+    'show:s',
+    'size|n:i',
+    'sort:s',
+    'tail',
+    'top:s',
 );
 
 # Search string is the rest of the argument string
@@ -71,7 +68,8 @@ pod2usage({-exitval => 1, -msg =>"Unknown option(s): $unknown_options"}) if $unk
 #--------------------------------------------------------------------------#
 # App Config
 my %CONFIG = (
-    size => (exists $OPT{size} && $OPT{size} > 0 ? int($OPT{size}) : 20),
+    size   => (exists $OPT{size} && $OPT{size} > 0 ? int($OPT{size}) : 20),
+    format => (exists $OPT{format} && length $OPT{format} ? lc $OPT{format} : 'yaml'),
 );
 
 #------------------------------------------------------------------------#
@@ -94,12 +92,17 @@ debug_var(\%FIELDS);
 
 # Which fields to show
 my @SHOW = ();
-my %HASH_FIELDS = ();
 if ( exists $OPT{show} && length $OPT{show} ) {
     @SHOW = grep { exists $FIELDS{$_} } split /,/, $OPT{show};
-    # hash will contain '{fieldname.key1.key2.key3}' => { field => 'fieldname', key => [ 'key1', 'key2', 'key3' ] }
-    %HASH_FIELDS = map { my @v = split( /\./, substr( $_, 1, -1 ) ); $_ => { field => shift( @v ), key => \@v  } } grep { /^\{.+\..+\}$/ } @SHOW;
-    debug_var(\%HASH_FIELDS);
+}
+# How to sort
+my $SORT = [ { '@timestamp' => $ORDER } ];
+if( exists $OPT{sort} && length $OPT{sort} ) {
+    $SORT = [
+        map { /:/ ? +{ split /:/ } : $_ }
+        split /,/,
+        $OPT{sort}
+    ];
 }
 if( $OPT{bases} ) {
     show_bases();
@@ -111,26 +114,28 @@ if( $OPT{fields} ) {
 }
 pod2usage({-exitval => 1, -msg => 'No search string specified'}) unless @query;
 pod2usage({-exitval => 1, -msg => 'Cannot use --tail and --top together'}) if exists $OPT{tail} && $OPT{top};
+pod2usage({-exitval => 1, -msg => 'Cannot use --tail and --sort together'}) if exists $OPT{tail} && $OPT{sort};
+pod2usage({-exitval => 1, -msg => 'Cannot use --sort along with --asc or --desc'})
+    if $OPT{sort} && ($OPT{asc} || $OPT{desc});
 pod2usage({-exitval => 1, -msg => 'Please specify --show with --tail'}) if exists $OPT{tail} && !@SHOW;
 
 # Process extra parameters
-my %extra = ();
+my %extra   = ();
 my @filters = ();
 if( exists $OPT{exists} ) {
     foreach my $field (split /[,:]/, $OPT{exists}) {
-        push @filters, { exists => { field => $OPT{exists} } };
+        push @filters, { exists => { field => $field } };
     }
 }
 if( exists $OPT{missing} ) {
     foreach my $field (split /[,:]/, $OPT{missing}) {
-        push @filters, { missing => { field => $OPT{exists} } };
+        push @filters, { missing => { field => $field } };
     }
 }
 if( @filters ) {
     $extra{filter} = @filters > 1 ? { and => \@filters } : shift @filters;
 }
-
-my $DONE = 1;
+my $DONE = 0;
 local $SIG{INT} = sub { $DONE=1 };
 
 my $top_type = exists $OPT{by} ? "aggregations" : "facets";
@@ -189,30 +194,41 @@ if( exists $OPT{top} ) {
     $CONFIG{size} = 0;  # and we do not want any results other than the facet data
 }
 elsif(exists $OPT{tail}) {
-    $CONFIG{size} = 10;
+    $CONFIG{size} = 20;
     @AGES = ($AGES[-1]);
-    $DONE = 0;
 }
 
-my $size = $CONFIG{size} > 50 ? 50 : $CONFIG{size};
+my $size              = $CONFIG{size} > 50 ? 50 : $CONFIG{size};
 my %displayed_indices = ();
-my $TOTAL_HITS = 0;
-my $last_hit_ts = undef;
-my $duration = 0;
-my $displayed = 0;
-my $header = exists $OPT{'no-header'};
-my $age = undef;
-my %last_batch_id=();
-my %FACET_TOTALS = ();
+my $TOTAL_HITS        = 0;
+my $last_hit_ts       = undef;
+my $duration          = 0;
+my $displayed         = 0;
+my $header            = exists $OPT{'no-header'};
+my $age               = undef;
+my %last_batch_id     = ();
+my %FACET_TOTALS      = ();
+my %AGES_SEEN         = ();
 
-AGES: while( !$DONE || @AGES ) {
-    $age = @AGES ? shift @AGES : $age;
-    select(undef,undef,undef,1) if exists $OPT{tail} && $last_hit_ts;
+AGES: while( !$DONE && @AGES ) {
+    # With --tail, we don't want to deplete @AGES
+    $age = $OPT{tail} ? $AGES[0] : shift @AGES;
+
+    # Pause for 200ms if we're tailing
+    select(undef,undef,undef,0.2) if exists $OPT{tail} && $last_hit_ts;
+
     my $start=time();
-    $last_hit_ts ||= strftime('%Y-%m-%dT%H:%M:%S%z',localtime($start));
+    $last_hit_ts ||= strftime('%Y-%m-%dT%H:%M:%S%z',localtime($start-30));
 
     # If we're tailing, bump the @query with a timestamp range
-    push @query, {range => {'@timestamp' => {gte => $last_hit_ts}}}  if exists $OPT{tail};
+    push @query, {range => {'@timestamp' => {gte => $last_hit_ts}}} if $OPT{tail};
+
+    # Header
+    if( exists $OPT{top} && !exists $AGES_SEEN{$age} ) {
+        output({color=>'yellow'}, "= Querying Indexes: " . join(',', @{ $by_age{$age} })) unless exists $AGES_SEEN{$age};
+        $AGES_SEEN{$age}=1;  # Yes, that's an array ref as a hash key, it works ;)
+    }
+
     my $result = es_request('_search',
         # Search Parameters
         {
@@ -231,11 +247,10 @@ AGES: while( !$DONE || @AGES ) {
                     must => \@query,
                 },
             },
-            sort       => [ { '@timestamp' => $ORDER } ],
+            sort       => $SORT,
             %extra,
         }
     );
-    debug_var($result);
     $duration += time() - $start;
 
     # Remove the last searched date from the @query
@@ -258,7 +273,7 @@ AGES: while( !$DONE || @AGES ) {
 
     my @always = qw(@timestamp);
     $header++ == 0 && @SHOW && output({color=>'cyan'}, join("\t", @always,@SHOW));
-    while( $result || !$DONE ) {
+    while( $result && !$DONE ) {
         my $hits = ref $result->{hits}{hits} eq 'ARRAY' ? $result->{hits}{hits} : [];
 
         # Handle Faceting
@@ -304,8 +319,7 @@ AGES: while( !$DONE || @AGES ) {
                     $record->{$f} = $hit->{_source}{$f};
                 }
                 foreach my $f (@SHOW) {
-                    $record->{$f} = exists $HASH_FIELDS{$f} ? extract_value( $HASH_FIELDS{$f}{key}, $hit->{_source}{$HASH_FIELDS{$f}{field}}, $hit->{_source}{'@fields'}{$HASH_FIELDS{$f}{field}} )
-                                  : exists $hit->{_source}{$f} ? $hit->{_source}{$f}
+                    $record->{$f} = exists $hit->{_source}{$f} ? $hit->{_source}{$f}
                                   : exists $hit->{_source}{'@fields'}{$f} ? $hit->{_source}{'@fields'}{$f}
                                   : undef;
                 }
@@ -320,21 +334,22 @@ AGES: while( !$DONE || @AGES ) {
                 foreach my $f (@always,@SHOW) {
                     my $v = '-';
                     if( exists $record->{$f} && defined $record->{$f} ) {
-                        $v = ref $record->{$f} ? Dumper $record->{$f} : $record->{$f};
+                        $v = ref $record->{$f} ? to_json($record->{$f},{allow_nonref=>1,canonical=>1}) : $record->{$f};
                     }
                     push @cols,$v;
                 }
                 $output = join("\t",@cols);
             }
             else {
-                $output = Dump $record;
+                $output = $CONFIG{format} eq 'json' ? to_json($record,{allow_nonref=>1,canonical=>1,pretty=>1})
+                        : Dump $record;
             }
 
             output({data=>1}, $output);
             $displayed++;
-            last if !exists $OPT{all} && $DONE && $displayed >= $CONFIG{size};
+            last if all_records_displayed();
         }
-        last if !exists $OPT{all} && $DONE && $displayed >= $CONFIG{size};
+        last if all_records_displayed();
 
         # Scroll forward
         $start = time;
@@ -347,7 +362,7 @@ AGES: while( !$DONE || @AGES ) {
         $duration += time - $start;
         last unless @{ $result->{hits}{hits} } > 0;
     }
-    last if !exists $OPT{all} && $DONE && $displayed >= $CONFIG{size};
+    last if all_records_displayed();
 }
 
 output({stderr=>1,color=>'yellow'},
@@ -369,11 +384,12 @@ if(!exists $OPT{by} && keys %FACET_TOTALS) {
     }
 }
 
-sub extract_value {
-    my ($key, $v1, $v2) = @_;
-    my $value = $v1 ? $v1 : $v2;
-    $value = ref($value) eq 'HASH' ? $value->{$_} : ref($value) eq 'ARRAY' ? $value->[$_] : undef for @{ $key };
-    return $value;
+sub all_records_displayed {
+    return 1 if $DONE;
+    return 0 if exists $OPT{tail};
+    return 0 if exists $OPT{all};
+    return 1 if $displayed >= $CONFIG{size};
+    return 0;
 }
 
 sub show_fields {
@@ -431,12 +447,12 @@ sub format_search_string {
                     $row ||=  0; # Default to the first row
                     my $id = sprintf("FILE=%s:%s[%d,%d]", $term, $file, $col, $row);
                     if( $row > @rows ) {
-                        verbose({color=>'yellow'}, "$id ROW $row is out-of-range, resetting to 0.");
+                        verbose({color=>'yellow',sticky=>1}, "$id ROW $row is out-of-range, resetting to 0.");
                         $row = 0;
                     }
                     my @set = splice @rows, $row, 500;
                     if(@rows) {
-                        verbose({color=>'yellow'}, sprintf '%s More than 500 rows, truncated, call with %s:%s[%d,%d] on next run.',
+                        verbose({color=>'yellow',sticky=>1}, sprintf '%s More than 500 rows, truncated, call with %s:%s[%d,%d] on next run.',
                             $id, $term, $file, $col, $row + 500
                         );
                     }
@@ -456,9 +472,13 @@ sub format_search_string {
                     }
                 }
             }
-            else {
-                $part =~ s/^([^:]+_ip):(\d+\.\d+)\.\*(?:\.\*)?$/$1:[$2.0.0 $2.255.255]/;
-                $part =~ s/^([^:]+_ip):(\d+\.\d+\.\d+)\.\*$/$1:[$2.0 $2.255]/;
+            if($term =~ /_ip$/ ) {
+                if($match =~ m|^\d{1,3}(\.\d{1,3}){1,3}(/\d+)?$|) {
+                    my $cidr = Net::CIDR::Lite->new();
+                    $cidr->add($match);
+                    my @range = split /-/, ($cidr->list_range)[0];
+                    $part = sprintf("%s_numeric:[%s TO %s]", $term, @range);
+                }
             }
         }
         push @modified, exists $BareWords{lc $part} ? $BareWords{lc $part} : $part;
@@ -478,7 +498,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 3.3
+version 3.4
 
 =head1 SYNOPSIS
 
@@ -500,6 +520,8 @@ Options:
     --all               Don't consider result size, just give me *everything*
     --asc               Sort by ascending timestamp
     --desc              Sort by descending timestamp (Default)
+    --sort              List of fields for custom sorting
+    --format            When --show isn't used, use this method for outputting the record, supported: json, yaml
     --no-header         Do not show the header with field names in the query results
     --fields            Display the field list for this index!
     --bases             Display the index base list for this cluster.
@@ -656,6 +678,24 @@ Print detailed help with examples
 Comma separated list of fields to display in the dump of the data
 
     --show src_ip,crit,file,out_bytes
+
+=item B<sort>
+
+Use this option to sort your documents on fields other than C<@timestamp>. Fields are given as a comma separated list:
+
+    --sort field1,field2
+
+To specify per-field sort direction use:
+
+    --sort field1:asc,field2:desc
+
+Using this option together with C<--asc>, C<--desc> or C<--tail> is not possible.
+
+=item B<format>
+
+Output format to use when the full record is dumped.  The default is 'yaml', but 'json' is also supported.
+
+    --format json
 
 =item B<tail>
 
