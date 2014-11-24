@@ -473,7 +473,7 @@ sub format_search_string {
                 }
             }
             if($term =~ /_ip$/ ) {
-                if($match =~ m|^\d{1,3}(\.\d{1,3}){1,3}(/\d+)?$|) {
+                if($match =~ m|^\d{1,3}(\.\d{1,3}){1,3}(/\d+)$|) {
                     my $cidr = Net::CIDR::Lite->new();
                     $cidr->add($match);
                     my @range = split /-/, ($cidr->list_range)[0];
@@ -498,7 +498,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 3.4
+version 3.4.1
 
 =head1 SYNOPSIS
 

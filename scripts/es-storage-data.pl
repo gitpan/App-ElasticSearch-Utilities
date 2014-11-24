@@ -188,7 +188,7 @@ es-storage-data.pl - Index pattern-aware elasticsearch storage statistics
 
 =head1 VERSION
 
-version 3.4
+version 3.4.1
 
 =head1 SYNOPSIS
 

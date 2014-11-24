@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '3.4'; # VERSION
+our $VERSION = '3.4.1'; # VERSION
 
 use strict;
 use warnings;
@@ -590,7 +590,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 3.4
+version 3.4.1
 
 =head1 SYNOPSIS
 

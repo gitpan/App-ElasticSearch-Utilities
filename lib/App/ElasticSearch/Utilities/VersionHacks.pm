@@ -1,7 +1,7 @@
 # ABSTRACT: Fix version issues to support all the things
 package App::ElasticSearch::Utilities::VersionHacks;
 
-our $VERSION = '3.4'; # VERSION
+our $VERSION = '3.4.1'; # VERSION
 use strict;
 use warnings;
 
@@ -24,6 +24,7 @@ my %SIMPLE = (
         1.1     => '_nodes',
         1.2     => '_nodes',
         1.3     => '_nodes',
+        1.4     => '_nodes',
     }
 );
 my %CALLBACKS = (
@@ -36,6 +37,7 @@ my %CALLBACKS = (
         1.1 => \&_cluster_state_1_0,
         1.2 => \&_cluster_state_1_0,
         1.3 => \&_cluster_state_1_0,
+        1.4 => \&_cluster_state_1_0,
     },
 );
 
@@ -164,7 +166,7 @@ App::ElasticSearch::Utilities::VersionHacks - Fix version issues to support all 
 
 =head1 VERSION
 
-version 3.4
+version 3.4.1
 
 =head1 AUTHOR
 
